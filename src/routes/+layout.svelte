@@ -13,8 +13,9 @@
 		<NavHamburger on:click={toggle} />
 		<NavUl {hidden}>
 			<NavLi href="/" active={true}>Home</NavLi>
-			<NavLi href={env.PUBLIC_CATALOG_HREF}>Catalog Application</NavLi>
-			<NavLi href={env.PUBLIC_DEVPORTAL_HREF}>Developer Portal</NavLi>
+			<NavLi href={env.PUBLIC_CATALOG_HREF} target="_blank">Catalog Application</NavLi>
+			<NavLi href={env.PUBLIC_DEVPORTAL_HREF} target="_blank">Developer Portal</NavLi>
+			<NavLi href={env.PUBLIC_PUZZLE_HREF} target="_blank">Map Puzzle</NavLi>
 		</NavUl>
 	</Navbar>
 	<div class="flex-auto overflow-y-auto">

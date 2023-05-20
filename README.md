@@ -14,6 +14,7 @@ The code examples are saved in S3 bucket and fetched and cached by the server.
 - ITEMS_STALE - The time in seconds to keep stale items in the cache.
 - PUBLIC_CATALOG_HREF - Path for the catalog application.
 - PUBLIC_DEVPORTAL_HREF - Path for the developer portal.
+- PUBLIC_PUZZLE_HREF - Path for the puzzle application.
 
 ## Configurations
 
