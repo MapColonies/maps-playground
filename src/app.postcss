@@ -3,5 +3,26 @@
 @tailwind components;
 @tailwind utilities;
 .flems {
-  height: 100% !important
+	height: 100% !important;
+}
+
+:is(.dark .toolbar) {
+	background-color: rgb(55 65 81);
+	color: #d1d1d1;
+}
+
+:is(.dark .console) {
+	background-color: rgb(55 65 81);
+	color: white !important;
+	opacity: 1 !important;
+}
+
+:is(.dark .console span) {
+	color: white;
+	opacity: 1;
+}
+
+:is(.dark .input label) {
+	color: #a7a7ef;
+	opacity: 1 !important;
 }
