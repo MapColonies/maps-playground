@@ -14,7 +14,7 @@
 	export let items: { name: string; displayName?: string }[];
 	export let activeClient: string | undefined;
 
-	$: outerDiv = classNames('-translate-x-0', $$props.outerDiv);
+	$: outerDiv = classNames('-translate-x-0', 'dark:bg-gray-800', $$props.outerDiv);
 </script>
 
 <BottomNav
@@ -41,7 +41,7 @@
 		<BottomNavItem
 			on:click={() => goto('/demo/' + activeClient + '/' + item.name)}
 			id="group-{item.name}"
-			btnDefault="basis-0 items-center justify-center p-4 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+			btnDefault="basis-0 items-center justify-center ml-[4px] mb-1 bg-gray-100 dark:bg-gray-600 rounded-lg p-4 text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 group"
 		>
 			{item.displayName || item.name}
 			<!-- {#if item.displayName === 'basic openlayers'}

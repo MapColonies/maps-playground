@@ -7,9 +7,11 @@
 	const flemsBaseConfig = {
 		shareButton: false,
 		linkTabs: false,
+		theme: 'material',
 		selected: '.js',
-		autoHeight: true
+		autoHeight: false
 	};
+
 
 	let flemsInstance: any;
 
@@ -17,7 +19,7 @@
 		flemsInstance.set({
 			...flemsBaseConfig,
 			files,
-			links: links.map((link) => ({ ...link, url: window.location.origin + link.url })),
+			links: links.map((link) => ({ ...link, url: window.location.origin + link.url }))
 		});
 	}
 
@@ -26,7 +28,7 @@
 		flemsInstance = window.Flems(flems, {
 			...flemsBaseConfig,
 			files,
-			links: links.map((link) => ({ ...link, url: window.location.origin + link.url })),
+			links: links.map((link) => ({ ...link, url: window.location.origin + link.url }))
 		});
 	});
 </script>
