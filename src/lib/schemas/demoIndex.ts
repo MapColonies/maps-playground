@@ -11,18 +11,25 @@ const demoMetadataSchema: JTDSchemaType<DemoMetadata> = {
 		}
 	},
 	properties: {
+		template: {
+			type: 'string'
+		},
+		packageJson: {
+			properties: {
+				main: {
+					type: 'string'
+				},
+				dependencies: {
+					values: {
+						type: 'string'
+					}
+				}
+			},
+			additionalProperties: true
+		},
 		files: {
 			elements: {
 				type: 'string'
-			}
-		},
-		links: {
-			elements: {
-				properties: {
-					name: { type: 'string' },
-					type: { enum: ['css', 'js'] },
-					url: { type: 'string' }
-				}
 			}
 		}
 	}

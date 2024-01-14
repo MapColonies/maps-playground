@@ -4,7 +4,7 @@
 	import { env } from '$env/dynamic/public';
 </script>
 
-<div class="flex flex-col h-screen">
+<div class="flex flex-col h-screen min-h-0">
 	<Navbar let:hidden let:toggle>
 		<NavBrand href="/">
 			<span class="mr-3 h-6 sm:h-9 text-3xl">🌎</span>

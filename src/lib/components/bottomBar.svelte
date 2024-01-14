@@ -13,7 +13,7 @@
 	export let clients: { name: string; defaultItem: string }[];
 	export let items: { name: string; displayName?: string }[];
 	export let activeClient: string | undefined;
-
+	
 	$: outerDiv = classNames('-translate-x-0', 'dark:bg-gray-800', $$props.outerDiv);
 </script>
 

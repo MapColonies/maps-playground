@@ -3,17 +3,15 @@ export interface File {
 	content: string;
 }
 
-export interface Link {
-	name: string;
-	url: string;
-	type: 'css' | 'js';
-}
-
 export interface DemoMetadata {
 	displayName?: string;
 	image?: string;
 	files: string[];
-	links: Link[];
+	template: string;
+	packageJson: {
+		main: string;
+		dependencies: Record<string, string>;
+	};
 }
 
 export type ClientMetadata = Record<string, DemoMetadata>;
