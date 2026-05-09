@@ -1,0 +1,209 @@
+{
+  "OpenLayers": {
+	  "WMTS": {
+      "displayName": "WMTS",
+      "files": ["openlayers-wmts/wmts.js", "config/common-config.js", "config/raster-config.js", "openlayers-wmts/openlayers.css", "openlayers-wmts/openlayers.html"],
+      "links": [
+        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+      ]
+    },
+    "OverviewMap": {
+      "displayName": "OverviewMap(MiniMap)",
+      "files": ["openlayers-overview-map/overview-map.js", "config/common-config.js", "config/raster-config.js", "openlayers-overview-map/overview-map.css", "openlayers-overview-map/overview-map.html"],
+      "links": [
+        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+      ]
+    },
+    "Permalink": {
+      "displayName": "Permalink",
+      "files": ["openlayers-permalink/permalink.js", "config/common-config.js", "config/raster-config.js", "openlayers-permalink/permalink.css", "openlayers-permalink/permalink.html"],
+      "links": [
+        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+      ]
+    },
+    "QueryService": {
+      "displayName": "QueryService",
+      "files": ["openlayers-query-service/query-service.js", "config/common-config.js", "config/raster-config.js", "config/vector-config.js", "openlayers-query-service/openlayers.css", "openlayers-query-service/openlayers.html"],
+      "links": [
+        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+      ]
+    },
+    "InteractiveFeatureSelect": {
+      "displayName": "Interactive Feature Select",
+      "files": ["openlayers-box-selection/box-selection.js", "config/common-config.js", "config/raster-config.js", "config/vector-config.js", "openlayers-box-selection/openlayers.css", "openlayers-box-selection/box-selection.html"],
+      "links": [
+        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+      ]
+    },
+    "InteractiveSensitiveBuildings": {
+      "displayName": "Interactive Sensitive Buldings Select",
+      "files": ["openlayers-sensitive/interactive-sensitive.js", "config/common-config.js", "config/raster-config.js", "config/vector-config.js", "openlayers-sensitive/openlayers.css", "openlayers-sensitive/openlayers.html"],
+      "links": [
+        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+      ]
+    },
+    "Debug Layer": {
+      "displayName": "DebugLayer",
+      "files": ["openlayers-debug-layer/debug-layer.js", "config/common-config.js", "config/raster-config.js", "openlayers-debug-layer/openlayers.css", "openlayers-debug-layer/openlayers.html"],
+      "links": [
+        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+      ]
+    },
+    "DrawAndModify": {
+      "displayName": "Draw and Modify Geodesic",
+      "files": ["openlayers-draw-and-modify/draw-and-modify.js", "config/common-config.js", "config/raster-config.js", "config/vector-config.js", "openlayers-draw-and-modify/draw-and-modify.css", "openlayers-draw-and-modify/draw-and-modify.html"],
+      "links": [
+        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+      ]
+    },
+    "PreloadTiles": {
+      "displayName": "Preload Tiles",
+      "files": ["openlayers-preload/preload.js", "config/common-config.js", "config/raster-config.js", "openlayers-preload/preload.css", "openlayers-preload/preload.html"],
+      "links": [
+        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+      ]
+    },
+    "DrawStreetLabels": {
+      "displayName": "Draw Street Labels",
+      "files": ["openlayers-street-labels/street-labels.js", "config/common-config.js", "config/raster-config.js", "config/vector-config.js", "openlayers-street-labels/street-labels.css", "openlayers-street-labels/street-labels.html"],
+      "links": [
+        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+      ]
+    },
+    "ol-ext": {
+      "displayName": "ol-ext",
+      "files": ["ol-ext-example/ol-ext.js", "config/common-config.js", "config/raster-config.js", "ol-ext-example/openlayers.css", "ol-ext-example/openlayers.html"],
+      "links": [
+        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+
+      ]
+    }
+  },
+  "cesium": {
+    "WMTS" : {
+      "displayName": "WMTS Imagery Provider",
+      "files": ["cesium-wmts/cesium.js", "config/common-config.js", "config/raster-config.js", "cesium-wmts/cesium.html"],
+      "links": [
+        {
+          "name": "cesium.js",
+          "url": "/libs/Cesium/Cesium.js",
+          "type": "js"
+        },
+        {
+          "name": "widgets.css",
+          "url": "/libs/Cesium/Widgets/widgets.css",
+          "type": "css"
+        }
+      ]
+    },
+	"GeoCoding" : {
+      "displayName": "GeoCoding",
+      "files": ["cesium-geocoding/cesium.js", "config/common-config.js", "config/raster-config.js", "config/vector-config.js", "cesium-geocoding/cesium.html"],
+      "links": [
+        {
+          "name": "cesium.js",
+          "url": "/libs/Cesium/Cesium.js",
+          "type": "js"
+        },
+        {
+          "name": "widgets.css",
+          "url": "/libs/Cesium/Widgets/widgets.css",
+          "type": "css"
+        }
+      ]
+    },
+	"Terrain" : {
+      "displayName": "Terrain Provider",
+      "files": ["cesium-terrain/cesium.js", "config/common-config.js", "config/raster-config.js", "config/dem-config.js", "cesium-terrain/cesium.html"],
+      "links": [
+        {
+          "name": "cesium.js",
+          "url": "/libs/Cesium/Cesium.js",
+          "type": "js"
+        },
+        {
+          "name": "widgets.css",
+          "url": "/libs/Cesium/Widgets/widgets.css",
+          "type": "css"
+        }
+      ]
+    },
+	"3D Model": {
+      "displayName": "3D Model",
+      "files": ["cesium-3d/3d-model.js", "config/common-config.js", "config/raster-config.js", "config/3d-config.js", "cesium-3d/cesium.html"],
+      "links": [
+        {
+          "name": "cesium.js",
+          "url": "/libs/Cesium/Cesium.js",
+          "type": "js"
+        },
+        {
+          "name": "widgets.css",
+          "url": "/libs/Cesium/Widgets/widgets.css",
+          "type": "css"
+        }
+      ]
+    },
+	"LayersSplit" : {
+	  "displayName": "Layers Split",
+	  "files": ["cesium-layers-split/split-layers.js", "config/common-config.js", "config/raster-config.js", "cesium-layers-split/split-layers.html", "cesium-layers-split/split-layers.css"],
+	  "links": [
+		{
+		  "name": "cesium.js",
+		  "url": "/libs/Cesium/Cesium.js",
+		  "type": "js"
+		},
+		{
+		  "name": "widgets.css",
+		  "url": "/libs/Cesium/Widgets/widgets.css",
+		  "type": "css"
+		}
+	  ]
+	},
+	"ViewShed" : {
+	  "displayName": "ViewShed",
+	  "files": ["cesium-viewshed/viewshed.js", "config/common-config.js", "config/raster-config.js", "config/3d-config.js", "config/dem-config.js", "cesium-viewshed/viewshed.html", "cesium-viewshed/viewshed.css"],
+	  "links": [
+		{
+		  "name": "cesium.js",
+		  "url": "/libs/Cesium/Cesium.js",
+		  "type": "js"
+		},
+		{
+		  "name": "widgets.css",
+		  "url": "/libs/Cesium/Widgets/widgets.css",
+		  "type": "css"
+		}
+	  ]
+	}
+  },
+  "leaflet": {
+    "WMTS": {
+      "displayName": "Basic WMTS Example",
+      "files": ["leaflet-wmts/wmts.js", "config/common-config.js", "config/raster-config.js", "leaflet-wmts/leaflet.css", "leaflet-wmts/leaflet.html"],
+      "links": [
+        {
+          "name": "leaflet.js",
+          "url": "/libs/leaflet/1.9.4/leaflet.js",
+          "type": "js"
+        },
+        {
+          "name": "leaflet.css",
+          "url": "/libs/leaflet/1.9.4/leaflet.css",
+          "type": "css"
+        }
+      ]
+    }
+  }
+}
