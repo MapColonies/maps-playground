@@ -1,4 +1,4 @@
-import { MAPCOLONIES_TILES_URL, TOKEN } from './common-config.js';
+import { MAPCOLONIES_TILES_URL, TOKEN } from './config/common-config.js';
 
 var WMTS_BASE_URL = `${MAPCOLONIES_TILES_URL}/api/raster/v1/wmts`;
 
