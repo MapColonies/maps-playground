@@ -8,9 +8,11 @@ set -euo pipefail
 # Reads AWS_* env vars (same as the app).
 #
 # Usage:
-#   ./scripts/upload-examples.sh [examples-dir]
+#   ./scripts/upload-examples.sh [--assets|-a] [examples-dir]
 #
-# The optional argument overrides the default examples/ directory.
+#   --assets / -a   also upload the examples/assets/ folder (omit to skip it)
+#
+# The optional examples-dir argument overrides the default examples/ directory.
 
 declare -A CMD_INSTALL=(
   [aws]="AWS CLI v2 — https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
@@ -37,6 +39,15 @@ if [[ -f "$REPO_ROOT/.env" ]]; then
   source "$REPO_ROOT/.env"
   set +a
 fi
+
+INCLUDE_ASSETS=false
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -a|--assets) INCLUDE_ASSETS=true; shift ;;
+    -*) echo "ERROR: unknown option '$1'" >&2; exit 1 ;;
+    *) break ;;
+  esac
+done
 
 EXAMPLES_DIR="${1:-$REPO_ROOT/examples}"
 BUCKET="${AWS_BUCKET:?AWS_BUCKET is required}"
@@ -100,7 +111,13 @@ while IFS= read -r -d '' file; do
       printf '%s\0' "update|$file" >> "$to_upload"
     fi
   fi
-done < <(find "$EXAMPLES_DIR" -type f -print0 | sort -z)
+done < <(
+    if [[ "$INCLUDE_ASSETS" == "false" ]]; then
+      find "$EXAMPLES_DIR" -type f -not -path "$EXAMPLES_DIR/assets/*" -print0
+    else
+      find "$EXAMPLES_DIR" -type f -print0
+    fi | sort -z
+  )
 
 upload_file() {
   local mode file key label
