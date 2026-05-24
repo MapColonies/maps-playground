@@ -1,3 +1,6 @@
+import { TOKEN } from './config/common-config.js';
+import { RASTER_SERVICE_URL, LAYER_NAME, LAYER_IMAGE_FORMAT } from './config/raster-config.js';
+
 const viewer = new Cesium.Viewer('cesiumContainer', {
   imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
     url: new Cesium.Resource({
@@ -8,7 +11,7 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
     }),
     layer: LAYER_NAME,
     style: "default",
-    format: "image/jpeg",
+    format: LAYER_IMAGE_FORMAT,
     tileMatrixSetID: "",
     tilingScheme: new Cesium.GeographicTilingScheme()
   }),
