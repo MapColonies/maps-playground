@@ -141,7 +141,7 @@
     },
 	"3D Model": {
       "displayName": "3D Model",
-      "files": ["cesium-3d/3d-model.js", "config/common-config.js", "config/raster-config.js", "config/3d-config.js", "cesium-3d/cesium.html"],
+      "files": ["cesium-3d/3d-model.js", "config/common-config.js", "config/raster-config.js", "config/3d-config.js", "config/dem-config.js", "cesium-3d/cesium.html"],
       "links": [
         {
           "name": "cesium.js",
