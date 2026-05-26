@@ -1,6 +1,6 @@
 'use strict';
 import { TOKEN } from './config/common-config.js';
-import { LAYER_NAME, RASTER_SERVICE_URL } from './config/raster-config.js';
+import { RASTER_SERVICE_URL, LAYER_NAME, LAYER_IMAGE_FORMAT } from './config/raster-config.js';
 import { GEOCODING_URL } from './config/vector-config.js';
 
 //Sandcastle_Begin
@@ -63,7 +63,7 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     }),
     layer: LAYER_NAME,
     style: "default",
-    format: "image/jpeg",
+    format: LAYER_IMAGE_FORMAT,
     tileMatrixSetID: "WorldCRS84",
     tilingScheme: new Cesium.GeographicTilingScheme()
   }),

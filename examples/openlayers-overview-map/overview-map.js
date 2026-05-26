@@ -1,5 +1,5 @@
 import { TOKEN } from './config/common-config.js';
-import { LAYER_NAME, WMTS_CAPABILITIES_URL } from './config/raster-config.js';
+import { WMTS_CAPABILITIES_URL, LAYER_NAME, ADDITIONAL_LAYER_NAME } from './config/raster-config.js';
 
 const WMTSParser = new ol.format.WMTSCapabilities();
 
@@ -11,7 +11,7 @@ fetch(WMTS_CAPABILITIES_URL)
             layer: LAYER_NAME
         });
         const optionsMiniMap = ol.source.WMTS.optionsFromCapabilities(results, {
-            layer: 'OSM-RasterVectorBest'
+            layer: ADDITIONAL_LAYER_NAME
         });
         options.urls = options.urls.map(url => {
             return url.concat(`?token=${TOKEN}`);
@@ -19,8 +19,8 @@ fetch(WMTS_CAPABILITIES_URL)
         optionsMiniMap.urls = optionsMiniMap.urls.map(url => {
             return url.concat(`?token=${TOKEN}`);
         });
-        rasterLayer = new ol.layer.Tile({ opacity: 1, source: new ol.source.WMTS(options), preload: 10 });
-        rasterLayer2 = new ol.layer.Tile({ opacity: 1, source: new ol.source.WMTS(optionsMiniMap) });
+        let rasterLayer = new ol.layer.Tile({ opacity: 1, source: new ol.source.WMTS(options), preload: 10 });
+        let rasterLayer2 = new ol.layer.Tile({ opacity: 1, source: new ol.source.WMTS(optionsMiniMap) });
         const overviewMapControl = new ol.control.OverviewMap({layers: [rasterLayer2], collapsed: false});
 
         const map = new ol.Map({
