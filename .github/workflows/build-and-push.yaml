@@ -1,0 +1,41 @@
+name: Push Artifacts to Azure Registry
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  DOMAIN: common
+
+jobs:
+  push-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.ACR_URL }}
+          username: ${{ secrets.ACR_PUSH_USER }}
+          password: ${{ secrets.ACR_PUSH_TOKEN }}
+
+      - name: Build and Push Docker image
+        id: build_and_push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ secrets.ACR_URL }}/${{ env.DOMAIN }}/${{ github.event.repository.name }}:${{ github.ref_name }}
+
+      - name: Update Docker Image in artifacts.json
+        uses: MapColonies/shared-workflows/actions/update-artifacts-file@update-artifacts-file-v1
+        with:
+          domain: ${{ env.DOMAIN }}
+          type: docker
+          artifact_name: ${{ github.event.repository.name }}
+          artifact_tag: ${{ github.ref_name }} # Using the git tag directly
+          registry: ${{ secrets.ACR_URL }}
+          github_token: ${{ secrets.GH_PAT }}
