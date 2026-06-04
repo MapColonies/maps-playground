@@ -1,0 +1,66 @@
+name: pull_request
+
+on: pull_request
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  eslint:
+    name: Run Project eslint
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node: [24.x]
+
+    steps:
+      - name: Check out Project Git repository
+        uses: actions/checkout@v6
+
+      - name: Init Nodejs
+        uses: MapColonies/shared-workflows/actions/init-npm@init-npm-v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Run Project linters
+        uses: wearerequired/lint-action@v2
+        with:
+          eslint: true
+          prettier: true
+          eslint_extensions: js,ts,svelte
+
+  svelte-check:
+    name: Run svelte-check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [24.x]
+    steps:
+      - name: Check out Project Git repository
+        uses: actions/checkout@v6
+
+      - name: Init Nodejs
+        uses: MapColonies/shared-workflows/actions/init-npm@init-npm-v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Run svelte-check
+        run: npm run check
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+  build_docker_image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v6
