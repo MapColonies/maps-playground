@@ -23,14 +23,13 @@ const client = new S3Client({
 		secretAccessKey
 	},
 	forcePathStyle: true,
-	region: awsRegion ?? 'us-east-1',
+	region: awsRegion ?? 'us-east-1'
 });
 
 export async function getStringObject(key: string): Promise<string> {
 	const command = new GetObjectCommand({
 		Bucket: bucket,
-		Key: key,
-
+		Key: key
 	});
 
 	const res = await client.send(command);
