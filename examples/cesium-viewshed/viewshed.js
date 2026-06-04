@@ -1,7 +1,9 @@
 import { TOKEN } from './config/common-config.js';
-import { RASTER_SERVICE_URL, LAYER_NAME, LAYER_IMAGE_FORMAT } from './config/raster-config.js';
-import { DEM_URL } from './config/dem-config.js';
-import { MODEL_3D_URL } from './config/3d-config.js';
+import { PRODUCT_ID as RASTER_PRODUCT_ID, PRODUCT_TYPE as RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT } from './config/raster-config.js';
+import { PRODUCT_ID as DEM_PRODUCT_ID, PRODUCT_TYPE as DEM_PRODUCT_TYPE } from './config/dem-config.js';
+import { PRODUCT_ID as MODEL_3D_PRODUCT_ID, PRODUCT_TYPE as MODEL_3D_PRODUCT_TYPE } from './config/3d-config.js';
+import { fetchServiceLink } from './utils/catalog-client.js';
+import { fetchWmtsTileTemplate } from './utils/wmts-utils.js';
 
 const fsShaderText = `
 #define USE_NORMAL_SHADING
@@ -590,15 +592,21 @@ let pointB = Cesium.Cartesian3.fromDegrees(
    35.200014, 33.268811,  40
 ); // Empire State Building
 
-const viewer = new Cesium.Viewer("cesiumContainer", {
+let viewer;
+Promise.all([
+  fetchWmtsTileTemplate(RASTER_PRODUCT_ID, RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT),
+  fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, 'WCS'),
+  fetchServiceLink('3d', MODEL_3D_PRODUCT_ID, MODEL_3D_PRODUCT_TYPE, '3DTiles'),
+]).then(([tileTemplate, demUrl, modelUrl]) => {
+viewer = new Cesium.Viewer("cesiumContainer", {
   imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
     url: new Cesium.Resource({
-      url: RASTER_SERVICE_URL,
+      url: tileTemplate,
       queryParameters: {
         token: TOKEN
       }
     }),
-    layer: LAYER_NAME,
+    layer: `${RASTER_PRODUCT_ID}-${RASTER_PRODUCT_TYPE}`,
     style: "default",
     format: LAYER_IMAGE_FORMAT,
     tileMatrixSetID: "WorldCRS84",
@@ -606,7 +614,7 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
   }),
    terrainProvider: new Cesium.CesiumTerrainProvider({
     url: new Cesium.Resource({
-      url: DEM_URL,
+      url: demUrl,
       queryParameters: {
         token: TOKEN
       }
@@ -616,7 +624,7 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
 
 viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
   url: new Cesium.Resource({
-      url: MODEL_3D_URL,
+      url: modelUrl,
       queryParameters: {
         token: TOKEN
       }
@@ -720,3 +728,4 @@ handler.setInputAction(() => {
         viewer.scene.screenSpaceCameraController.enableInputs = true;
     }
 }, Cesium.ScreenSpaceEventType.LEFT_UP);
+});
