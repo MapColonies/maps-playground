@@ -1,6 +1,7 @@
 import { TOKEN } from './config/common-config.js';
-import { LAYER_NAME, WMTS_CAPABILITIES_URL } from './config/raster-config.js';
+import { PRODUCT_ID, PRODUCT_TYPE } from './config/raster-config.js';
 import { VECTOR_WFS_URL } from './config/vector-config.js';
+import { fetchServiceLink } from './utils/catalog-client.js';
 
 const WMTSParser = new ol.format.WMTSCapabilities();
 let rasterLayer;
@@ -75,12 +76,13 @@ selectedFeatures.on(['add', 'remove'], function () {
   }
 });
 
-fetch(WMTS_CAPABILITIES_URL)
+fetchServiceLink('raster', PRODUCT_ID, PRODUCT_TYPE, 'WMTS')
+	.then(url => fetch(`${url}?token=${TOKEN}`))
 	.then(response => response.text())
 	.then(text => {
 		const results = WMTSParser.read(text);
 		const options = ol.source.WMTS.optionsFromCapabilities(results, {
-			layer: LAYER_NAME
+			layer: `${PRODUCT_ID}-${PRODUCT_TYPE}`
 		});
 		options.urls = options.urls.map(url => {
 			return url.concat(`?token=${TOKEN}`);
