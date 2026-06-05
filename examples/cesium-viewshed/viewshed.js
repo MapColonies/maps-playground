@@ -1,7 +1,19 @@
 import { TOKEN } from './config/common-config.js';
-import { PRODUCT_ID as RASTER_PRODUCT_ID, PRODUCT_TYPE as RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT } from './config/raster-config.js';
-import { PRODUCT_ID as DEM_PRODUCT_ID, PRODUCT_TYPE as DEM_PRODUCT_TYPE, DEM_SCHEME } from './config/dem-config.js';
-import { PRODUCT_ID as MODEL_3D_PRODUCT_ID, PRODUCT_TYPE as MODEL_3D_PRODUCT_TYPE, MODEL_3D_SCHEME } from './config/3d-config.js';
+import {
+	PRODUCT_ID as RASTER_PRODUCT_ID,
+	PRODUCT_TYPE as RASTER_PRODUCT_TYPE,
+	LAYER_IMAGE_FORMAT
+} from './config/raster-config.js';
+import {
+	PRODUCT_ID as DEM_PRODUCT_ID,
+	PRODUCT_TYPE as DEM_PRODUCT_TYPE,
+	DEM_SCHEME
+} from './config/dem-config.js';
+import {
+	PRODUCT_ID as MODEL_3D_PRODUCT_ID,
+	PRODUCT_TYPE as MODEL_3D_PRODUCT_TYPE,
+	MODEL_3D_SCHEME
+} from './config/3d-config.js';
 import { fetchServiceLink } from './utils/catalog-client.js';
 import { fetchWmtsTileTemplate } from './utils/wmts-utils.js';
 
@@ -175,33 +187,33 @@ void main()
         FragColor = mix(texture(colorTexture, v_textureCoordinates),vec4(shadowArea_color,1.0),percentShade);
     }
 }`;
-const fsShader = fsShaderText.replace("`;","");
+const fsShader = fsShaderText.replace('`;', '');
 //https://github.com/DigitalArsenal/SensorShadow
 const {
-  ShadowMap,
-  PerspectiveFrustum,
-  Camera,
-  Color,
-  defaultValue,
-  PositionProperty,
-  ConstantPositionProperty,
-  Cartesian2,
-  Cartesian3,
-  Cartesian4,
-  EllipsoidTerrainProvider,
-  PostProcessStage,
-  Math : CesiumMath
+	ShadowMap,
+	PerspectiveFrustum,
+	Camera,
+	Color,
+	defaultValue,
+	PositionProperty,
+	ConstantPositionProperty,
+	Cartesian2,
+	Cartesian3,
+	Cartesian4,
+	EllipsoidTerrainProvider,
+	PostProcessStage,
+	Math: CesiumMath
 } = Cesium;
 
 const defaultValues = {
-  cameraPosition: new ConstantPositionProperty(),
-  viewPosition: new ConstantPositionProperty(),
-  viewAreaColor: new Color(0, 1, 0),
-  shadowAreaColor: new Color(1, 0, 0),
-  alpha: 0.5,
-  frustum: true,
-  size: 4096,
-  depthBias: 2e-12,
+	cameraPosition: new ConstantPositionProperty(),
+	viewPosition: new ConstantPositionProperty(),
+	viewAreaColor: new Color(0, 1, 0),
+	shadowAreaColor: new Color(1, 0, 0),
+	alpha: 0.5,
+	frustum: true,
+	size: 4096,
+	depthBias: 2e-12
 };
 
 /**
@@ -219,513 +231,481 @@ const defaultValues = {
  * @property {function|null} preUpdateListener - A pre-update listener function.
  */
 class SensorShadow {
-  /**
-   * Constructs a new SensorShadow instance.
-   *
-   * @param {Object} viewer - A reference to the Cesium viewer instance.
-   * @param {Object} options - An optional configuration object.
-   *
-   * @example
-   * let sensorShadow = new SensorShadow(viewer, {
-   *   cameraPosition: new Cartesian3(0, 0, 0),
-   *   viewPosition: new Cartesian3(1, 1, 1),
-   *   viewAreaColor: new Color(0, 1, 0),
-   *   shadowAreaColor: new Color(1, 0, 0),
-   *   alpha: 0.5,
-   *   frustum: true,
-   *   size: 512
-   * });
-   */
-  constructor(viewer, options = {}) {
-    this.viewer = viewer;
+	/**
+	 * Constructs a new SensorShadow instance.
+	 *
+	 * @param {Object} viewer - A reference to the Cesium viewer instance.
+	 * @param {Object} options - An optional configuration object.
+	 *
+	 * @example
+	 * let sensorShadow = new SensorShadow(viewer, {
+	 *   cameraPosition: new Cartesian3(0, 0, 0),
+	 *   viewPosition: new Cartesian3(1, 1, 1),
+	 *   viewAreaColor: new Color(0, 1, 0),
+	 *   shadowAreaColor: new Color(1, 0, 0),
+	 *   alpha: 0.5,
+	 *   frustum: true,
+	 *   size: 512
+	 * });
+	 */
+	constructor(viewer, options = {}) {
+		this.viewer = viewer;
 
-      this.cameraPosition =
-      typeof options.cameraPosition.getValue === "function"
-        ? options.cameraPosition
-        : new ConstantPositionProperty(options.cameraPosition);
+		this.cameraPosition =
+			typeof options.cameraPosition.getValue === 'function'
+				? options.cameraPosition
+				: new ConstantPositionProperty(options.cameraPosition);
 
-    this.viewPosition =
-      typeof options.viewPosition.getValue === "function"
-        ? options.viewPosition
-        : new ConstantPositionProperty(options.viewPosition);
+		this.viewPosition =
+			typeof options.viewPosition.getValue === 'function'
+				? options.viewPosition
+				: new ConstantPositionProperty(options.viewPosition);
 
-    this.viewAreaColor = defaultValue(
-      options.viewAreaColor,
-      defaultValues.viewAreaColor
-    );
+		this.viewAreaColor = defaultValue(options.viewAreaColor, defaultValues.viewAreaColor);
 
-    this.shadowAreaColor = defaultValue(
-      options.shadowAreaColor,
-      defaultValues.shadowAreaColor
-    );
+		this.shadowAreaColor = defaultValue(options.shadowAreaColor, defaultValues.shadowAreaColor);
 
-    this.alpha = defaultValue(options.alpha, defaultValues.alpha);
-    this.size = defaultValue(options.size, defaultValues.size);
-    this.frustum = defaultValue(options.frustum, defaultValues.frustum);
-    this.depthBias = defaultValue(options.depthBias, defaultValues.depthBias);
+		this.alpha = defaultValue(options.alpha, defaultValues.alpha);
+		this.size = defaultValue(options.size, defaultValues.size);
+		this.frustum = defaultValue(options.frustum, defaultValues.frustum);
+		this.depthBias = defaultValue(options.depthBias, defaultValues.depthBias);
 
-    this.preUpdateListener = null;
+		this.preUpdateListener = null;
 
-    if (this.cameraPosition && this.viewPosition) {
-      this._addToScene();
-    }
-  }
+		if (this.cameraPosition && this.viewPosition) {
+			this._addToScene();
+		}
+	}
 
-  /**
-   * Get the actual position of the camera.
-   * This method calculates the position vector based on the current time.
-   *
-   * @private
-   * @returns {Cartesian3} The calculated camera position vector.
-   */
-  get _getVectors() {
-    let positionVector = this.cameraPosition.getValue(
-      this.viewer.clock.currentTime
-    );
-    let viewVector = this.viewPosition.getValue(this.viewer.clock.currentTime);
-    let distanceBetweenVectors = Number(
-      Cartesian3.distance(viewVector, positionVector).toFixed(1)
-    );
+	/**
+	 * Get the actual position of the camera.
+	 * This method calculates the position vector based on the current time.
+	 *
+	 * @private
+	 * @returns {Cartesian3} The calculated camera position vector.
+	 */
+	get _getVectors() {
+		let positionVector = this.cameraPosition.getValue(this.viewer.clock.currentTime);
+		let viewVector = this.viewPosition.getValue(this.viewer.clock.currentTime);
+		let distanceBetweenVectors = Number(Cartesian3.distance(viewVector, positionVector).toFixed(1));
 
-    if (distanceBetweenVectors > 10000) {
-      let multiple = 1 - 10000 / distanceBetweenVectors;
-      positionVector = Cartesian3.lerp(
-        positionVector,
-        viewVector,
-        multiple,
-        new Cartesian3()
-      );
-    }
+		if (distanceBetweenVectors > 10000) {
+			let multiple = 1 - 10000 / distanceBetweenVectors;
+			positionVector = Cartesian3.lerp(positionVector, viewVector, multiple, new Cartesian3());
+		}
 
-    return { positionVector, viewVector };
-  }
+		return { positionVector, viewVector };
+	}
 
-  /**
-   * Adds the SensorShadow to the scene.
-   *
-   * @private
-   */
-  _addToScene() {
-    this._createShadowMap();
-    this._addPostProcess();
-    this.viewer.scene.primitives.add(this);
+	/**
+	 * Adds the SensorShadow to the scene.
+	 *
+	 * @private
+	 */
+	_addToScene() {
+		this._createShadowMap();
+		this._addPostProcess();
+		this.viewer.scene.primitives.add(this);
+	}
 
-  }
+	/**
+	 * Creates the shadow map.
+	 *
+	 * @private
+	 */
+	_createShadowMap(updateOnly) {
+		let { positionVector, viewVector } = this._getVectors;
 
-  /**
-   * Creates the shadow map.
-   *
-   * @private
-   */
-  _createShadowMap(updateOnly) {
-    let { positionVector, viewVector } = this._getVectors;
+		const distance = Number(Cartesian3.distance(viewVector, positionVector).toFixed(1));
 
-    const distance = Number(
-      Cartesian3.distance(viewVector, positionVector).toFixed(1)
-    );
+		if (distance > 10000) {
+			const multiple = 1 - 10000 / distance;
+			positionVector = Cartesian3.lerp(positionVector, viewVector, multiple, new Cartesian3());
+		}
 
-    if (distance > 10000) {
-      const multiple = 1 - 10000 / distance;
-      positionVector = Cartesian3.lerp(
-        positionVector,
-        viewVector,
-        multiple,
-        new Cartesian3()
-      );
-    }
+		const scene = this.viewer.scene;
 
-    const scene = this.viewer.scene;
+		const camera = new Camera(scene);
 
-    const camera = new Camera(scene);
+		camera.position = positionVector;
 
-    camera.position = positionVector;
+		camera.direction = Cartesian3.subtract(viewVector, positionVector, new Cartesian3(0, 0, 0));
 
-    camera.direction = Cartesian3.subtract(
-      viewVector,
-      positionVector,
-      new Cartesian3(0, 0, 0)
-    );
+		camera.up = Cartesian3.normalize(positionVector, new Cartesian3(0, 0, 0));
 
-    camera.up = Cartesian3.normalize(positionVector, new Cartesian3(0, 0, 0));
+		camera.frustum = new PerspectiveFrustum({
+			fov: CesiumMath.toRadians(120),
+			aspectRatio: scene.canvas.clientWidth / scene.canvas.clientHeight,
+			near: 0.1,
+			far: distance
+		});
 
-    camera.frustum = new PerspectiveFrustum({
-      fov: CesiumMath.toRadians(120),
-      aspectRatio: scene.canvas.clientWidth / scene.canvas.clientHeight,
-      near: 0.1,
-      far: distance,
-    });
+		if (!updateOnly) {
+			this.viewShadowMap = new ShadowMap({
+				lightCamera: camera,
+				enable: true,
+				isPointLight: false,
+				isSpotLight: true,
+				cascadesEnabled: false,
+				context: scene.context,
+				size: this.size,
+				pointLightRadius: distance,
+				fromLightSource: false,
+				maximumDistance: distance
+			});
+		} else {
+			this.viewShadowMap._lightCamera.position = positionVector;
+		}
 
-    if (!updateOnly) {
-      this.viewShadowMap = new ShadowMap({
-        lightCamera: camera,
-        enable: true,
-        isPointLight: false,
-        isSpotLight: true,
-        cascadesEnabled: false,
-        context: scene.context,
-        size: this.size,
-        pointLightRadius: distance,
-        fromLightSource: false,
-        maximumDistance: distance,
-      });
-    } else {
-      this.viewShadowMap._lightCamera.position = positionVector;
-    }
+		this.viewShadowMap.normalOffset = true;
+		this.viewShadowMap._terrainBias.depthBias = 0.0;
+	}
 
-    this.viewShadowMap.normalOffset = true;
-    this.viewShadowMap._terrainBias.depthBias = 0.0;
-  }
+	/**
+	 * Adds post processing to the SensorShadow.
+	 *
+	 * @private
+	 */
+	_addPostProcess() {
+		const SensorShadow = this;
 
-  /**
-   * Adds post processing to the SensorShadow.
-   *
-   * @private
-   */
-  _addPostProcess() {
-    const SensorShadow = this;
+		const viewShadowMap = this.viewShadowMap;
+		const primitiveBias = viewShadowMap._isPointLight
+			? viewShadowMap._pointBias
+			: viewShadowMap._primitiveBias;
+		this.postProcess = this.viewer.scene.postProcessStages.add(
+			new PostProcessStage({
+				fragmentShader: fsShader,
+				uniforms: {
+					view_distance: function () {
+						return SensorShadow.distance;
+					},
+					viewArea_color: function () {
+						return SensorShadow.viewAreaColor;
+					},
+					shadowArea_color: function () {
+						return SensorShadow.shadowAreaColor;
+					},
+					percentShade: function () {
+						return SensorShadow.alpha;
+					},
+					shadowMap: function () {
+						return viewShadowMap._shadowMapTexture;
+					},
+					_shadowMap_cascadeSplits: function () {
+						return viewShadowMap._cascadeSplits;
+					},
+					_shadowMap_cascadeMatrices: function () {
+						return viewShadowMap._cascadeMatrices;
+					},
+					_shadowMap_cascadeDistances: function () {
+						return viewShadowMap._cascadeDistances;
+					},
+					shadowMap_matrix: function () {
+						return viewShadowMap._shadowMapMatrix;
+					},
+					shadowMap_camera_positionEC: function () {
+						return viewShadowMap._lightPositionEC;
+					},
+					shadowMap_camera_directionEC: function () {
+						return viewShadowMap._lightDirectionEC;
+					},
+					cameraPosition_WC: function () {
+						return SensorShadow.viewer.camera.positionWC;
+					},
+					viewPosition_WC: function () {
+						return SensorShadow.viewPosition.getValue(SensorShadow.viewer.clock.currentTime);
+					},
+					shadowMap_camera_up: function () {
+						return viewShadowMap._lightCamera.up;
+					},
+					shadowMap_camera_dir: function () {
+						return viewShadowMap._lightCamera.direction;
+					},
+					shadowMap_camera_right: function () {
+						return viewShadowMap._lightCamera.right;
+					},
+					ellipsoidInverseRadii: function () {
+						let radii = SensorShadow.viewer.scene.globe.ellipsoid.radii;
+						return new Cartesian3(1 / radii.x, 1 / radii.y, 1 / radii.z);
+					},
+					shadowMap_texelSizeDepthBiasAndNormalShadingSmooth: function () {
+						var viewShed2D = new Cartesian2();
+						viewShed2D.x = 1 / viewShadowMap._textureSize.x;
+						viewShed2D.y = 1 / viewShadowMap._textureSize.y;
 
-    const viewShadowMap = this.viewShadowMap;
-    const primitiveBias = viewShadowMap._isPointLight
-      ? viewShadowMap._pointBias
-      : viewShadowMap._primitiveBias;
-    this.postProcess = this.viewer.scene.postProcessStages.add(
-      new PostProcessStage({
-        fragmentShader: fsShader,
-        uniforms: {
-          view_distance: function () {
-            return SensorShadow.distance;
-          },
-          viewArea_color: function () {
-            return SensorShadow.viewAreaColor;
-          },
-          shadowArea_color: function () {
-            return SensorShadow.shadowAreaColor;
-          },
-          percentShade: function () {
-            return SensorShadow.alpha;
-          },
-          shadowMap: function () {
-            return viewShadowMap._shadowMapTexture;
-          },
-          _shadowMap_cascadeSplits: function () {
-            return viewShadowMap._cascadeSplits;
-          },
-          _shadowMap_cascadeMatrices: function () {
-            return viewShadowMap._cascadeMatrices;
-          },
-          _shadowMap_cascadeDistances: function () {
-            return viewShadowMap._cascadeDistances;
-          },
-          shadowMap_matrix: function () {
-            return viewShadowMap._shadowMapMatrix;
-          },
-          shadowMap_camera_positionEC: function () {
-            return viewShadowMap._lightPositionEC;
-          },
-          shadowMap_camera_directionEC: function () {
-            return viewShadowMap._lightDirectionEC;
-          },
-          cameraPosition_WC: function () {
-            return SensorShadow.viewer.camera.positionWC;
-          },
-          viewPosition_WC: function () {
-            return SensorShadow.viewPosition.getValue(
-              SensorShadow.viewer.clock.currentTime
-            );
-          },
-          shadowMap_camera_up: function () {
-            return viewShadowMap._lightCamera.up;
-          },
-          shadowMap_camera_dir: function () {
-            return viewShadowMap._lightCamera.direction;
-          },
-          shadowMap_camera_right: function () {
-            return viewShadowMap._lightCamera.right;
-          },
-          ellipsoidInverseRadii: function () {
-            let radii = SensorShadow.viewer.scene.globe.ellipsoid.radii;
-            return new Cartesian3(1 / radii.x, 1 / radii.y, 1 / radii.z);
-          },
-          shadowMap_texelSizeDepthBiasAndNormalShadingSmooth: function () {
-            var viewShed2D = new Cartesian2();
-            viewShed2D.x = 1 / viewShadowMap._textureSize.x;
-            viewShed2D.y = 1 / viewShadowMap._textureSize.y;
+						return Cartesian4.fromElements(
+							viewShed2D.x,
+							viewShed2D.y,
+							this.depthBias,
+							primitiveBias.normalShadingSmooth,
+							this.combinedUniforms1
+						);
+					},
+					shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness: function () {
+						return Cartesian4.fromElements(
+							primitiveBias.normalOffsetScale,
+							viewShadowMap._distance,
+							viewShadowMap.maximumDistance,
+							viewShadowMap._darkness,
+							this.combinedUniforms2
+						);
+					},
+					exclude_terrain: function () {
+						return SensorShadow.viewer.terrainProvider instanceof EllipsoidTerrainProvider;
+					}
+				}
+			})
+		);
 
-            return Cartesian4.fromElements(
-              viewShed2D.x,
-              viewShed2D.y,
-              this.depthBias,
-              primitiveBias.normalShadingSmooth,
-              this.combinedUniforms1
-            );
-          },
-          shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness:
-            function () {
-              return Cartesian4.fromElements(
-                primitiveBias.normalOffsetScale,
-                viewShadowMap._distance,
-                viewShadowMap.maximumDistance,
-                viewShadowMap._darkness,
-                this.combinedUniforms2
-              );
-            },
-          exclude_terrain: function () {
-            return (
-              SensorShadow.viewer.terrainProvider instanceof
-              EllipsoidTerrainProvider
-            );
-          },
-        },
-      })
-    );
+		// If a previous listener was added, remove it
+		if (this.preUpdateListener) {
+			viewer.scene.preUpdate.removeEventListener(this.preUpdateListener);
+		}
 
-    // If a previous listener was added, remove it
-    if (this.preUpdateListener) {
-      viewer.scene.preUpdate.removeEventListener(this.preUpdateListener);
-    }
+		// Add a new listener
+		this.preUpdateListener = () => {
+			if (!this.viewShadowMap._shadowMapTexture) {
+				this.postProcess.enabled = false;
+			} else {
+				this.postProcess.enabled = true;
+			}
+		};
 
-    // Add a new listener
-    this.preUpdateListener = () => {
-      if (!this.viewShadowMap._shadowMapTexture) {
-        this.postProcess.enabled = false;
-      } else {
-        this.postProcess.enabled = true;
-      }
-    };
+		viewer.scene.preUpdate.addEventListener(this.preUpdateListener);
+	}
 
-    viewer.scene.preUpdate.addEventListener(this.preUpdateListener);
-  }
+	update(frameState) {
+		this._createShadowMap(true);
+		frameState.shadowMaps.push(this.viewShadowMap);
+	}
 
-  update(frameState) {
-    this._createShadowMap(true);
-    frameState.shadowMaps.push(this.viewShadowMap);
-  }
+	destroy() {
+		if (this.preUpdateListener) {
+			viewer.scene.preUpdate.removeEventListener(this.preUpdateListener);
+		}
+		this.viewer.scene.postProcessStages.remove(this.postProcess);
+		for (let property in this) {
+			if (this.hasOwnProperty(property)) {
+				delete this[property];
+			}
+		}
+	}
 
-  destroy() {
-    if (this.preUpdateListener) {
-      viewer.scene.preUpdate.removeEventListener(this.preUpdateListener);
-    }
-    this.viewer.scene.postProcessStages.remove(this.postProcess);
-    for (let property in this) {
-      if (this.hasOwnProperty(property)) {
-        delete this[property];
-      }
-    }
-  }
+	get size() {
+		return this._size;
+	}
 
-  get size() {
-    return this._size;
-  }
+	set size(v) {
+		this._size = v;
+	}
 
-  set size(v) {
-    this._size = v;
-  }
+	get depthBias() {
+		return this._depthBias;
+	}
 
-  get depthBias() {
-    return this._depthBias;
-  }
+	set depthBias(v) {
+		this._depthBias = v;
+	}
 
-  set depthBias(v) {
-    this._depthBias = v;
-  }
+	get cameraPosition() {
+		return this._cameraPosition;
+	}
 
-  get cameraPosition() {
-    return this._cameraPosition;
-  }
+	set cameraPosition(v) {
+		this._cameraPosition = v;
+	}
 
-  set cameraPosition(v) {
-    this._cameraPosition = v;
-  }
+	get viewPosition() {
+		return this._viewPosition;
+	}
 
-  get viewPosition() {
-    return this._viewPosition;
-  }
+	set viewPosition(v) {
+		this._viewPosition = v;
+	}
 
-  set viewPosition(v) {
-    this._viewPosition = v;
-  }
+	get frustum() {
+		return this._frustum;
+	}
 
-  get frustum() {
-    return this._frustum;
-  }
+	set frustum(v) {
+		this._frustum = v;
+	}
 
-  set frustum(v) {
-    this._frustum = v;
-  }
+	get distance() {
+		return this._distance;
+	}
 
-  get distance() {
-    return this._distance;
-  }
+	set distance(v) {
+		this._distance = v;
+	}
 
-  set distance(v) {
-    this._distance = v;
-  }
+	get viewAreaColor() {
+		return this._viewAreaColor;
+	}
 
-  get viewAreaColor() {
-    return this._viewAreaColor;
-  }
+	set viewAreaColor(v) {
+		this._viewAreaColor = v;
+	}
 
-  set viewAreaColor(v) {
-    this._viewAreaColor = v;
-  }
+	get shadowAreaColor() {
+		return this._shadowAreaColor;
+	}
 
-  get shadowAreaColor() {
-    return this._shadowAreaColor;
-  }
+	set shadowAreaColor(v) {
+		this._shadowAreaColor = v;
+	}
 
-  set shadowAreaColor(v) {
-    this._shadowAreaColor = v;
-  }
+	get alpha() {
+		return this._alpha;
+	}
 
-  get alpha() {
-    return this._alpha;
-  }
-
-  set alpha(v) {
-    this._alpha = v;
-  }
+	set alpha(v) {
+		this._alpha = v;
+	}
 }
 
-let pointA = Cesium.Cartesian3.fromDegrees(35.198213 ,33.264289,  250); // Central Park
+let pointA = Cesium.Cartesian3.fromDegrees(35.198213, 33.264289, 250); // Central Park
 
-let pointB = Cesium.Cartesian3.fromDegrees(
-   35.200014, 33.268811,  40
-); // Empire State Building
+let pointB = Cesium.Cartesian3.fromDegrees(35.200014, 33.268811, 40); // Empire State Building
 
 let viewer;
 Promise.all([
-  fetchWmtsTileTemplate(RASTER_PRODUCT_ID, RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT),
-  fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, DEM_SCHEME),
-  fetchServiceLink('3d', MODEL_3D_PRODUCT_ID, MODEL_3D_PRODUCT_TYPE, MODEL_3D_SCHEME),
+	fetchWmtsTileTemplate(RASTER_PRODUCT_ID, RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT),
+	fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, DEM_SCHEME),
+	fetchServiceLink('3d', MODEL_3D_PRODUCT_ID, MODEL_3D_PRODUCT_TYPE, MODEL_3D_SCHEME)
 ]).then(([tileTemplate, demUrl, modelUrl]) => {
-viewer = new Cesium.Viewer("cesiumContainer", {
-  imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
-    url: new Cesium.Resource({
-      url: tileTemplate,
-      queryParameters: {
-        token: TOKEN
-      }
-    }),
-    layer: `${RASTER_PRODUCT_ID}-${RASTER_PRODUCT_TYPE}`,
-    style: "default",
-    format: LAYER_IMAGE_FORMAT,
-    tileMatrixSetID: "WorldCRS84",
-    tilingScheme: new Cesium.GeographicTilingScheme()
-  }),
-   terrainProvider: new Cesium.CesiumTerrainProvider({
-    url: new Cesium.Resource({
-      url: demUrl,
-      queryParameters: {
-        token: TOKEN
-      }
-    })
-  }),
-});
+	viewer = new Cesium.Viewer('cesiumContainer', {
+		imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
+			url: new Cesium.Resource({
+				url: tileTemplate,
+				queryParameters: {
+					token: TOKEN
+				}
+			}),
+			layer: `${RASTER_PRODUCT_ID}-${RASTER_PRODUCT_TYPE}`,
+			style: 'default',
+			format: LAYER_IMAGE_FORMAT,
+			tileMatrixSetID: 'WorldCRS84',
+			tilingScheme: new Cesium.GeographicTilingScheme()
+		}),
+		terrainProvider: new Cesium.CesiumTerrainProvider({
+			url: new Cesium.Resource({
+				url: demUrl,
+				queryParameters: {
+					token: TOKEN
+				}
+			})
+		})
+	});
 
-viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
-  url: new Cesium.Resource({
-      url: modelUrl,
-      queryParameters: {
-        token: TOKEN
-      }
-   }),
-  maximumScreenSpaceError: 5,
-  cullRequestsWhileMovingMultiplier: 120,
-  preloadFlightDestination: true,
-  preferLeaves: true,
-  skipLevelOfDetail: true
-}));
+	viewer.scene.primitives.add(
+		new Cesium.Cesium3DTileset({
+			url: new Cesium.Resource({
+				url: modelUrl,
+				queryParameters: {
+					token: TOKEN
+				}
+			}),
+			maximumScreenSpaceError: 5,
+			cullRequestsWhileMovingMultiplier: 120,
+			preloadFlightDestination: true,
+			preferLeaves: true,
+			skipLevelOfDetail: true
+		})
+	);
 
+	viewer.camera.flyTo({
+		destination: pointA,
+		orientation: {
+			heading: Cesium.Math.toRadians(25.0),
+			pitch: Cesium.Math.toRadians(-10.0),
+			roll: 0.0
+		}
+	});
+	viewer.camera.moveEnd.addEventListener(function () {
+		const { camera } = viewer;
+		if (camera.position?.clone) {
+			const cameraState = {
+				position: camera.position.clone(),
+				direction: camera.direction.clone(),
+				up: camera.up.clone()
+			};
+		}
+	});
 
-viewer.camera.flyTo({
-  destination: pointA,
-  orientation: {
-    heading: Cesium.Math.toRadians(25.0),
-    pitch: Cesium.Math.toRadians(-10.0),
-    roll: 0.0
-  }
-});
-viewer.camera.moveEnd.addEventListener(function () {
-    const { camera } = viewer;
-    if (camera.position?.clone) {
-        const cameraState = {
-            position: camera.position.clone(),
-            direction: camera.direction.clone(),
-            up: camera.up.clone()
-        };
-    }
-});
+	viewer.clock.shouldAnimate = false;
+	//return;
+	const redBall = viewer.entities.add({
+		position: pointA,
+		point: {
+			pixelSize: 10,
+			color: Cesium.Color.RED
+		}
+	});
 
-viewer.clock.shouldAnimate = false;
-//return;
-const redBall = viewer.entities.add({
-    position: pointA,
-    point: {
-        pixelSize: 10,
-        color: Cesium.Color.RED,
-    },
-});
+	//return;
+	const blueBall = viewer.entities.add({
+		position: pointB,
+		point: {
+			pixelSize: 10,
+			color: Cesium.Color.BLUE
+		}
+	});
 
-//return;
-const blueBall = viewer.entities.add({
-    position: pointB,
-    point: {
-        pixelSize: 10,
-        color: Cesium.Color.BLUE,
-    },
-});
+	//@ts-ignore
+	var sensorShadowInstance = new SensorShadow(viewer, {
+		cameraPosition: redBall.position,
+		viewPosition: pointB
+	});
 
-//@ts-ignore
-var sensorShadowInstance = new SensorShadow(viewer, {
-    cameraPosition: redBall.position,
-    viewPosition: pointB,
-});
+	let handler;
+	let pickedEntity;
+	let cartesian;
+	handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+	handler.setInputAction((click) => {
+		cartesian = viewer.camera.pickEllipsoid(click.position, viewer.scene.globe.ellipsoid);
+		if (cartesian) {
+			var pickedObject = viewer.scene.pick(click.position);
+			if (Cesium.defined(pickedObject) && pickedObject.id === redBall) {
+				pickedEntity = pickedObject.id;
+				viewer.scene.screenSpaceCameraController.enableInputs = false;
+			}
+		}
+	}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
+	handler.setInputAction((movement) => {
+		if (pickedEntity) {
+			let newCartesian = viewer.camera.pickEllipsoid(
+				movement.endPosition,
+				viewer.scene.globe.ellipsoid
+			);
+			if (newCartesian) {
+				// Convert the picked Cartesian3 to Cartographic
+				let newCartographic = Cesium.Cartographic.fromCartesian(newCartesian);
 
-let handler;
-let pickedEntity;
-let cartesian;
-handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
-handler.setInputAction((click) => {
-    cartesian = viewer.camera.pickEllipsoid(click.position, viewer.scene.globe.ellipsoid);
-    if (cartesian) {
-        var pickedObject = viewer.scene.pick(click.position);
-        if (Cesium.defined(pickedObject) && pickedObject.id === redBall) {
-            pickedEntity = pickedObject.id;
-            viewer.scene.screenSpaceCameraController.enableInputs = false;
-        }
-    }
-}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+				// Get the original height
+				let originalCartographic = Cesium.Cartographic.fromCartesian(
+					pickedEntity.position.getValue(Cesium.JulianDate.now())
+				);
 
-handler.setInputAction((movement) => {
-    if (pickedEntity) {
-        let newCartesian = viewer.camera.pickEllipsoid(movement.endPosition, viewer.scene.globe.ellipsoid);
-        if (newCartesian) {
-            // Convert the picked Cartesian3 to Cartographic
-            let newCartographic = Cesium.Cartographic.fromCartesian(newCartesian);
+				// Update the height to the original one
+				newCartographic.height = originalCartographic.height;
 
-            // Get the original height
-            let originalCartographic = Cesium.Cartographic.fromCartesian(
-                pickedEntity.position.getValue(Cesium.JulianDate.now())
-            );
+				// Convert the updated Cartographic back to Cartesian3
+				let updatedCartesian = Cesium.Cartographic.toCartesian(newCartographic);
 
-            // Update the height to the original one
-            newCartographic.height = originalCartographic.height;
+				// Set the new position
+				pickedEntity.position = new Cesium.ConstantPositionProperty(updatedCartesian);
+				sensorShadowInstance.cameraPosition = pickedEntity.position;
+			}
+		}
+	}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
-            // Convert the updated Cartographic back to Cartesian3
-            let updatedCartesian = Cesium.Cartographic.toCartesian(newCartographic);
-
-            // Set the new position
-            pickedEntity.position = new Cesium.ConstantPositionProperty(updatedCartesian);
-            sensorShadowInstance.cameraPosition = pickedEntity.position;
-        }
-    }
-}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-
-handler.setInputAction(() => {
-    if (pickedEntity) {
-        pickedEntity = undefined;
-        viewer.scene.screenSpaceCameraController.enableInputs = true;
-    }
-}, Cesium.ScreenSpaceEventType.LEFT_UP);
+	handler.setInputAction(() => {
+		if (pickedEntity) {
+			pickedEntity = undefined;
+			viewer.scene.screenSpaceCameraController.enableInputs = true;
+		}
+	}, Cesium.ScreenSpaceEventType.LEFT_UP);
 });

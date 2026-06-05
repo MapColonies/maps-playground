@@ -23,7 +23,7 @@
 <BottomNav
 	position="static"
 	navType="custom"
-	outerDiv={outerDiv}
+	{outerDiv}
 	innerDefault="overflow-x-scroll justify-center"
 	innerDiv="flex flex-row"
 >
