@@ -12,7 +12,6 @@
 		autoHeight: false
 	};
 
-
 	let flemsInstance: any;
 
 	$: if (flemsInstance) {

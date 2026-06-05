@@ -1,9 +1,10 @@
 # Heading level 1
+
 ## Heading level 2
+
 ### Heading level 3
 
-Heading level 1
-===============	
+# Heading level 1
 
 1. First item
 2. Second item
@@ -17,7 +18,7 @@ At the command prompt, type `nano`.
 
 ```javascript
 function test() {
-  console.log("notice the blank line before this function?");
+	console.log('notice the blank line before this function?');
 }
 ```
 

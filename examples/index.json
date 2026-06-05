@@ -1,209 +1,384 @@
 {
-  "OpenLayers": {
-	  "WMTS": {
-      "displayName": "WMTS",
-      "files": ["openlayers-wmts/wmts.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/xml-utils.js", "openlayers-wmts/openlayers.css", "openlayers-wmts/openlayers.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-      ]
-    },
-    "OverviewMap": {
-      "displayName": "OverviewMap(MiniMap)",
-      "files": ["openlayers-overview-map/overview-map.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/xml-utils.js", "openlayers-overview-map/overview-map.css", "openlayers-overview-map/overview-map.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-      ]
-    },
-    "Permalink": {
-      "displayName": "Permalink",
-      "files": ["openlayers-permalink/permalink.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/xml-utils.js", "openlayers-permalink/permalink.css", "openlayers-permalink/permalink.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-      ]
-    },
-    "QueryService": {
-      "displayName": "QueryService",
-      "files": ["openlayers-query-service/query-service.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/xml-utils.js", "config/vector-config.js", "openlayers-query-service/openlayers.css", "openlayers-query-service/openlayers.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-      ]
-    },
-    "InteractiveFeatureSelect": {
-      "displayName": "Interactive Feature Select",
-      "files": ["openlayers-box-selection/box-selection.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/xml-utils.js", "config/vector-config.js", "openlayers-box-selection/openlayers.css", "openlayers-box-selection/box-selection.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-      ]
-    },
-    "InteractiveSensitiveBuildings": {
-      "displayName": "Interactive Sensitive Buldings Select",
-      "files": ["openlayers-sensitive/interactive-sensitive.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/xml-utils.js", "config/vector-config.js", "openlayers-sensitive/openlayers.css", "openlayers-sensitive/openlayers.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-      ]
-    },
-    "Debug Layer": {
-      "displayName": "DebugLayer",
-      "files": ["openlayers-debug-layer/debug-layer.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/xml-utils.js", "openlayers-debug-layer/openlayers.css", "openlayers-debug-layer/openlayers.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-      ]
-    },
-    "DrawAndModify": {
-      "displayName": "Draw and Modify Geodesic",
-      "files": ["openlayers-draw-and-modify/draw-and-modify.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/xml-utils.js", "config/vector-config.js", "openlayers-draw-and-modify/draw-and-modify.css", "openlayers-draw-and-modify/draw-and-modify.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-      ]
-    },
-    "PreloadTiles": {
-      "displayName": "Preload Tiles",
-      "files": ["openlayers-preload/preload.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/xml-utils.js", "openlayers-preload/preload.css", "openlayers-preload/preload.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-      ]
-    },
-    "DrawStreetLabels": {
-      "displayName": "Draw Street Labels",
-      "files": ["openlayers-street-labels/street-labels.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/xml-utils.js", "config/vector-config.js", "openlayers-street-labels/street-labels.css", "openlayers-street-labels/street-labels.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-      ]
-    },
-    "ol-ext": {
-      "displayName": "ol-ext",
-      "files": ["ol-ext-example/ol-ext.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/xml-utils.js", "ol-ext-example/openlayers.css", "ol-ext-example/openlayers.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-
-      ]
-    }
-  },
-  "Cesium": {
-    "WMTS" : {
-      "displayName": "WMTS Imagery Provider",
-      "files": ["cesium-wmts/cesium.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/wmts-utils.js", "utils/xml-utils.js", "cesium-wmts/cesium.html"],
-      "links": [
-        {
-          "name": "cesium.js",
-          "url": "/libs/Cesium/Cesium.js",
-          "type": "js"
-        },
-        {
-          "name": "widgets.css",
-          "url": "/libs/Cesium/Widgets/widgets.css",
-          "type": "css"
-        }
-      ]
-    },
-	"GeoCoding" : {
-      "displayName": "GeoCoding",
-      "files": ["cesium-geocoding/cesium.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/wmts-utils.js", "utils/xml-utils.js", "config/vector-config.js", "cesium-geocoding/cesium.html"],
-      "links": [
-        {
-          "name": "cesium.js",
-          "url": "/libs/Cesium/Cesium.js",
-          "type": "js"
-        },
-        {
-          "name": "widgets.css",
-          "url": "/libs/Cesium/Widgets/widgets.css",
-          "type": "css"
-        }
-      ]
-    },
-	"Terrain" : {
-      "displayName": "Terrain Provider",
-      "files": ["cesium-terrain/cesium.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/wmts-utils.js", "utils/xml-utils.js", "config/dem-config.js", "cesium-terrain/cesium.html"],
-      "links": [
-        {
-          "name": "cesium.js",
-          "url": "/libs/Cesium/Cesium.js",
-          "type": "js"
-        },
-        {
-          "name": "widgets.css",
-          "url": "/libs/Cesium/Widgets/widgets.css",
-          "type": "css"
-        }
-      ]
-    },
-	"3D Model": {
-      "displayName": "3D Model (South Lebanon)",
-      "files": ["cesium-3d/3d-model.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/wmts-utils.js", "utils/xml-utils.js", "config/3d-config.js", "config/dem-config.js", "cesium-3d/cesium.html"],
-      "links": [
-        {
-          "name": "cesium.js",
-          "url": "/libs/Cesium/Cesium.js",
-          "type": "js"
-        },
-        {
-          "name": "widgets.css",
-          "url": "/libs/Cesium/Widgets/widgets.css",
-          "type": "css"
-        }
-      ]
-    },
-	"LayersSplit" : {
-	  "displayName": "Layers Split",
-	  "files": ["cesium-layers-split/split-layers.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/wmts-utils.js", "utils/xml-utils.js", "cesium-layers-split/split-layers.html", "cesium-layers-split/split-layers.css"],
-	  "links": [
-		{
-		  "name": "cesium.js",
-		  "url": "/libs/Cesium/Cesium.js",
-		  "type": "js"
+	"OpenLayers": {
+		"WMTS": {
+			"displayName": "WMTS",
+			"description": "Loads a MapColonies raster layer into OpenLayers via the WMTS capabilities document. Shows how to authenticate with a token, parse capabilities, and build a tile source.\n\nUse this as the starting point for any 2D map backed by MapColonies tiles — it covers the auth + capabilities handshake you would otherwise have to wire up yourself.",
+			"files": [
+				"openlayers-wmts/wmts.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/xml-utils.js",
+				"openlayers-wmts/openlayers.css",
+				"openlayers-wmts/openlayers.html"
+			],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
 		},
-		{
-		  "name": "widgets.css",
-		  "url": "/libs/Cesium/Widgets/widgets.css",
-		  "type": "css"
+		"OverviewMap": {
+			"displayName": "OverviewMap(MiniMap)",
+			"description": "Adds an OpenLayers OverviewMap control — a minimap in the corner that mirrors the main view.\n\nGives users spatial context when zoomed in deeply, without you having to build a synced second map by hand.",
+			"files": [
+				"openlayers-overview-map/overview-map.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/xml-utils.js",
+				"openlayers-overview-map/overview-map.css",
+				"openlayers-overview-map/overview-map.html"
+			],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
+		},
+		"Permalink": {
+			"displayName": "Permalink",
+			"description": "Keeps the map center, zoom and rotation in sync with the URL hash, and restores them on reload.\n\nLets users share a deep-link to any view and bookmark map state — no backend persistence needed.",
+			"files": [
+				"openlayers-permalink/permalink.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/xml-utils.js",
+				"openlayers-permalink/permalink.css",
+				"openlayers-permalink/permalink.html"
+			],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
+		},
+		"QueryService": {
+			"displayName": "QueryService",
+			"description": "Queries the MapColonies vector WFS endpoint and renders matching features on top of the raster basemap.\n\nShows the request shape and response handling so you can filter and display server-side data without writing the WFS plumbing yourself.",
+			"files": [
+				"openlayers-query-service/query-service.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/xml-utils.js",
+				"config/vector-config.js",
+				"openlayers-query-service/openlayers.css",
+				"openlayers-query-service/openlayers.html"
+			],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
+		},
+		"InteractiveFeatureSelect": {
+			"displayName": "Interactive Feature Select",
+			"description": "Drag-box selection over vector features, with hit testing and styled selection state.\n\nDrop-in pattern for bulk operations (export, edit, delete) on map features — saves you from reinventing the box-drag + selection bookkeeping.",
+			"files": [
+				"openlayers-box-selection/box-selection.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/xml-utils.js",
+				"config/vector-config.js",
+				"openlayers-box-selection/openlayers.css",
+				"openlayers-box-selection/box-selection.html"
+			],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
+		},
+		"InteractiveSensitiveBuildings": {
+			"displayName": "Interactive Sensitive Buldings Select",
+			"description": "Loads sensitive building features, highlights them on hover, and exposes attribute data on click.\n\nReference for domain-specific POI workflows where styling, hit detection and attribute panels need to work together.",
+			"files": [
+				"openlayers-sensitive/interactive-sensitive.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/xml-utils.js",
+				"config/vector-config.js",
+				"openlayers-sensitive/openlayers.css",
+				"openlayers-sensitive/openlayers.html"
+			],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
+		},
+		"Debug Layer": {
+			"displayName": "DebugLayer",
+			"description": "Overlays the WMTS tile grid with tile coordinates and matrix IDs.\n\nUse during integration to verify that your tile matrix set, origin and resolutions actually line up — turns 'why is my map blank' into a visible diagnosis.",
+			"files": [
+				"openlayers-debug-layer/debug-layer.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/xml-utils.js",
+				"openlayers-debug-layer/openlayers.css",
+				"openlayers-debug-layer/openlayers.html"
+			],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
+		},
+		"DrawAndModify": {
+			"displayName": "Draw and Modify Geodesic",
+			"description": "Draw and edit points, lines and polygons with geodesic geometry — distances and areas are computed on the ellipsoid, not the projected plane.\n\nIf you need measurement-correct sketching (AOIs, range rings, routes), this saves you from the classic 'planar distance looks wrong at high latitudes' bug.",
+			"files": [
+				"openlayers-draw-and-modify/draw-and-modify.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/xml-utils.js",
+				"config/vector-config.js",
+				"openlayers-draw-and-modify/draw-and-modify.css",
+				"openlayers-draw-and-modify/draw-and-modify.html"
+			],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
+		},
+		"PreloadTiles": {
+			"displayName": "Preload Tiles",
+			"description": "Configures the tile layer to preload neighbouring zoom levels in the background.\n\nResult: pan and zoom feel snappier because the next tiles are already in cache. Useful when you need a smooth UX on slow networks without writing a custom tile cache.",
+			"files": [
+				"openlayers-preload/preload.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/xml-utils.js",
+				"openlayers-preload/preload.css",
+				"openlayers-preload/preload.html"
+			],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
+		},
+		"DrawStreetLabels": {
+			"displayName": "Draw Street Labels",
+			"description": "Renders street-name labels from a vector source with collision avoidance and rotation-aware placement.\n\nShortcut to readable labelling on top of raster basemaps — the placement/rotation logic is where naive implementations usually fall over.",
+			"files": [
+				"openlayers-street-labels/street-labels.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/xml-utils.js",
+				"config/vector-config.js",
+				"openlayers-street-labels/street-labels.css",
+				"openlayers-street-labels/street-labels.html"
+			],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
+		},
+		"ol-ext": {
+			"displayName": "ol-ext",
+			"description": "Integrates the ol-ext extension library on top of the MapColonies WMTS basemap, showcasing ready-made controls and interactions.\n\nUse it as a survey of off-the-shelf widgets (legends, layer switchers, popups) so you don't end up reimplementing common UI from scratch.",
+			"files": [
+				"ol-ext-example/ol-ext.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/xml-utils.js",
+				"ol-ext-example/openlayers.css",
+				"ol-ext-example/openlayers.html"
+			],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
 		}
-	  ]
 	},
-	"ViewShed" : {
-	  "displayName": "ViewShed",
-	  "files": ["cesium-viewshed/viewshed.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/wmts-utils.js", "utils/xml-utils.js", "config/3d-config.js", "config/dem-config.js", "cesium-viewshed/viewshed.html", "cesium-viewshed/viewshed.css"],
-	  "links": [
-		{
-		  "name": "cesium.js",
-		  "url": "/libs/Cesium/Cesium.js",
-		  "type": "js"
+	"Cesium": {
+		"WMTS": {
+			"displayName": "WMTS Imagery Provider",
+			"description": "Wires a MapColonies WMTS raster layer into Cesium as a WebMapTileServiceImageryProvider, using the capabilities document to pick the right tile matrix set.\n\nStart here for any 3D globe view backed by MapColonies imagery — the capabilities + tilingScheme matching is the part most integrators get wrong.",
+			"files": [
+				"cesium-wmts/cesium.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/wmts-utils.js",
+				"utils/xml-utils.js",
+				"cesium-wmts/cesium.html"
+			],
+			"links": [
+				{
+					"name": "cesium.js",
+					"url": "/libs/Cesium/Cesium.js",
+					"type": "js"
+				},
+				{
+					"name": "widgets.css",
+					"url": "/libs/Cesium/Widgets/widgets.css",
+					"type": "css"
+				}
+			]
 		},
-		{
-		  "name": "widgets.css",
-		  "url": "/libs/Cesium/Widgets/widgets.css",
-		  "type": "css"
+		"GeoCoding": {
+			"displayName": "GeoCoding",
+			"description": "Sends user-typed queries to the MapColonies geocoding service and flies the Cesium camera to matching results.\n\nDrop-in 'search this place' UX for 3D viewers — covers request shape, result ranking and camera animation in one example.",
+			"files": [
+				"cesium-geocoding/cesium.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/wmts-utils.js",
+				"utils/xml-utils.js",
+				"config/vector-config.js",
+				"cesium-geocoding/cesium.html"
+			],
+			"links": [
+				{
+					"name": "cesium.js",
+					"url": "/libs/Cesium/Cesium.js",
+					"type": "js"
+				},
+				{
+					"name": "widgets.css",
+					"url": "/libs/Cesium/Widgets/widgets.css",
+					"type": "css"
+				}
+			]
+		},
+		"Terrain": {
+			"displayName": "Terrain Provider",
+			"description": "Attaches a MapColonies DEM as a Cesium terrain provider so the globe has real elevation underneath the imagery.\n\nGives you photorealistic relief and correct picking heights without having to host or tile your own DEM.",
+			"files": [
+				"cesium-terrain/cesium.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/wmts-utils.js",
+				"utils/xml-utils.js",
+				"config/dem-config.js",
+				"cesium-terrain/cesium.html"
+			],
+			"links": [
+				{
+					"name": "cesium.js",
+					"url": "/libs/Cesium/Cesium.js",
+					"type": "js"
+				},
+				{
+					"name": "widgets.css",
+					"url": "/libs/Cesium/Widgets/widgets.css",
+					"type": "css"
+				}
+			]
+		},
+		"3D Model": {
+			"displayName": "3D Model (South Lebanon)",
+			"description": "Composes the full MapColonies 3D stack: WMTS imagery, DEM terrain and a photo-realistic 3D Tiles mesh, all aligned in one scene.\n\nReference for end-to-end 3D scene assembly — shows the loading order and provider config that makes imagery, terrain and meshes line up correctly.",
+			"files": [
+				"cesium-3d/3d-model.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/wmts-utils.js",
+				"utils/xml-utils.js",
+				"config/3d-config.js",
+				"config/dem-config.js",
+				"cesium-3d/cesium.html"
+			],
+			"links": [
+				{
+					"name": "cesium.js",
+					"url": "/libs/Cesium/Cesium.js",
+					"type": "js"
+				},
+				{
+					"name": "widgets.css",
+					"url": "/libs/Cesium/Widgets/widgets.css",
+					"type": "css"
+				}
+			]
+		},
+		"LayersSplit": {
+			"displayName": "Layers Split",
+			"description": "Splits the Cesium view between two imagery layers with a draggable divider — left side shows layer A, right side shows layer B.\n\nReady-made before/after compare UX for change detection, version review or A/B imagery without writing the splitter math yourself.",
+			"files": [
+				"cesium-layers-split/split-layers.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/wmts-utils.js",
+				"utils/xml-utils.js",
+				"cesium-layers-split/split-layers.html",
+				"cesium-layers-split/split-layers.css"
+			],
+			"links": [
+				{
+					"name": "cesium.js",
+					"url": "/libs/Cesium/Cesium.js",
+					"type": "js"
+				},
+				{
+					"name": "widgets.css",
+					"url": "/libs/Cesium/Widgets/widgets.css",
+					"type": "css"
+				}
+			]
+		},
+		"ViewShed": {
+			"displayName": "ViewShed",
+			"description": "Computes a viewshed (visible / not visible) from an observer point over the 3D Tiles mesh and DEM, using a custom shader.\n\nLine-of-sight analysis for planning, security and coverage use cases — the shader plus depth-buffer trick is the hard part this example does for you.",
+			"files": [
+				"cesium-viewshed/viewshed.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/wmts-utils.js",
+				"utils/xml-utils.js",
+				"config/3d-config.js",
+				"config/dem-config.js",
+				"cesium-viewshed/viewshed.html",
+				"cesium-viewshed/viewshed.css"
+			],
+			"links": [
+				{
+					"name": "cesium.js",
+					"url": "/libs/Cesium/Cesium.js",
+					"type": "js"
+				},
+				{
+					"name": "widgets.css",
+					"url": "/libs/Cesium/Widgets/widgets.css",
+					"type": "css"
+				}
+			]
 		}
-	  ]
+	},
+	"Leaflet": {
+		"WMTS": {
+			"displayName": "Basic WMTS Example",
+			"description": "Minimal Leaflet map consuming the MapColonies WMTS service via a plain L.tileLayer.\n\nGood entry point when you want a lightweight 2D map without OpenLayers — shows the URL template and token handling needed to hit the same backend.",
+			"files": [
+				"leaflet-wmts/wmts.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/wmts-utils.js",
+				"utils/xml-utils.js",
+				"leaflet-wmts/leaflet.css",
+				"leaflet-wmts/leaflet.html"
+			],
+			"links": [
+				{
+					"name": "leaflet.js",
+					"url": "/libs/leaflet/1.9.4/leaflet.js",
+					"type": "js"
+				},
+				{
+					"name": "leaflet.css",
+					"url": "/libs/leaflet/1.9.4/leaflet.css",
+					"type": "css"
+				}
+			]
+		}
 	}
-  },
-  "Leaflet": {
-    "WMTS": {
-      "displayName": "Basic WMTS Example",
-      "files": ["leaflet-wmts/wmts.js", "config/common-config.js", "config/raster-config.js", "utils/catalog-client.js", "utils/wmts-utils.js", "utils/xml-utils.js", "leaflet-wmts/leaflet.css", "leaflet-wmts/leaflet.html"],
-      "links": [
-        {
-          "name": "leaflet.js",
-          "url": "/libs/leaflet/1.9.4/leaflet.js",
-          "type": "js"
-        },
-        {
-          "name": "leaflet.css",
-          "url": "/libs/leaflet/1.9.4/leaflet.css",
-          "type": "css"
-        }
-      ]
-    }
-  }
 }
