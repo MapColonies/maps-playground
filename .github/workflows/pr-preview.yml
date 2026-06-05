@@ -1,0 +1,57 @@
+name: PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pr-preview-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    # Skip forks: secrets (AWS creds) are not exposed to PRs from forks.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        if: github.event.action != 'closed'
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: github.event.action != 'closed'
+        run: npm ci
+
+      - name: Build static site
+        if: github.event.action != 'closed'
+        env:
+          BUILD_TARGET: gh-pages
+          BASE_PATH: /${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.number }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ENDPOINT_URL: ${{ secrets.AWS_ENDPOINT_URL }}
+          AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
+          INDEX_KEY: 'index.json'
+          ITEMS_TIMEOUT: '60'
+          ITEMS_STALE: '60'
+          PUBLIC_CATALOG_HREF: ${{ vars.PUBLIC_CATALOG_HREF }}
+          PUBLIC_DEVPORTAL_HREF: ${{ vars.PUBLIC_DEVPORTAL_HREF }}
+          PUBLIC_PUZZLE_HREF: ${{ vars.PUBLIC_PUZZLE_HREF }}
+        run: npm run build
+
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./build
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+          action: auto
