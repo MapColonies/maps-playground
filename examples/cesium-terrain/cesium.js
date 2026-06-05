@@ -1,12 +1,12 @@
 import { TOKEN } from './config/common-config.js';
 import { PRODUCT_ID as RASTER_PRODUCT_ID, PRODUCT_TYPE as RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT } from './config/raster-config.js';
-import { PRODUCT_ID as DEM_PRODUCT_ID, PRODUCT_TYPE as DEM_PRODUCT_TYPE } from './config/dem-config.js';
+import { PRODUCT_ID as DEM_PRODUCT_ID, PRODUCT_TYPE as DEM_PRODUCT_TYPE, DEM_SCHEME } from './config/dem-config.js';
 import { fetchServiceLink } from './utils/catalog-client.js';
 import { fetchWmtsTileTemplate } from './utils/wmts-utils.js';
 
 Promise.all([
   fetchWmtsTileTemplate(RASTER_PRODUCT_ID, RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT),
-  fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, 'WCS'),
+  fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, DEM_SCHEME),
 ]).then(([tileTemplate, demUrl]) => {
   const viewer = new Cesium.Viewer("cesiumContainer", {
     imageryProvider: new Cesium.WebMapTileServiceImageryProvider({

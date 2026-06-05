@@ -1,5 +1,5 @@
 import { TOKEN } from './config/common-config.js';
-import { PRODUCT_ID, PRODUCT_TYPE } from './config/raster-config.js';
+import { PRODUCT_ID, PRODUCT_TYPE, RASTER_SCHEME } from './config/raster-config.js';
 import { fetchServiceLink } from './utils/catalog-client.js';
 
 const WMTSParser = new ol.format.WMTSCapabilities();
@@ -141,7 +141,7 @@ selectedFeatures.on(['add', 'remove'], function () {
   }
 });
 
-fetchServiceLink('raster', PRODUCT_ID, PRODUCT_TYPE, 'WMTS')
+fetchServiceLink('raster', PRODUCT_ID, PRODUCT_TYPE, RASTER_SCHEME)
 	.then(url => fetch(`${url}?token=${TOKEN}`))
 	.then(response => response.text())
 	.then(text => {
