@@ -1,5 +1,5 @@
 import { TOKEN } from './config/common-config.js';
-import { PRODUCT_ID, PRODUCT_TYPE } from './config/raster-config.js';
+import { PRODUCT_ID, PRODUCT_TYPE, RASTER_SCHEME } from './config/raster-config.js';
 import { VECTOR_WFS_URL } from './config/vector-config.js';
 import { fetchServiceLink } from './utils/catalog-client.js';
 
@@ -37,7 +37,7 @@ let rasterLayer;
   });
 
 
-fetchServiceLink('raster', PRODUCT_ID, PRODUCT_TYPE, 'WMTS')
+fetchServiceLink('raster', PRODUCT_ID, PRODUCT_TYPE, RASTER_SCHEME)
 	.then(url => fetch(`${url}?token=${TOKEN}`))
 	.then(response => response.text())
 	.then(text => {

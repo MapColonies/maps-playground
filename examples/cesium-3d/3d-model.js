@@ -1,14 +1,14 @@
 import { TOKEN } from './config/common-config.js';
 import { PRODUCT_ID as RASTER_PRODUCT_ID, PRODUCT_TYPE as RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT } from './config/raster-config.js';
-import { PRODUCT_ID as DEM_PRODUCT_ID, PRODUCT_TYPE as DEM_PRODUCT_TYPE } from './config/dem-config.js';
-import { PRODUCT_ID as MODEL_3D_PRODUCT_ID, PRODUCT_TYPE as MODEL_3D_PRODUCT_TYPE } from './config/3d-config.js';
+import { PRODUCT_ID as DEM_PRODUCT_ID, PRODUCT_TYPE as DEM_PRODUCT_TYPE, DEM_SCHEME } from './config/dem-config.js';
+import { PRODUCT_ID as MODEL_3D_PRODUCT_ID, PRODUCT_TYPE as MODEL_3D_PRODUCT_TYPE, MODEL_3D_SCHEME } from './config/3d-config.js';
 import { fetchServiceLink } from './utils/catalog-client.js';
 import { fetchWmtsTileTemplate } from './utils/wmts-utils.js';
 
 Promise.all([
   fetchWmtsTileTemplate(RASTER_PRODUCT_ID, RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT),
-  fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, 'WCS'),
-  fetchServiceLink('3d', MODEL_3D_PRODUCT_ID, MODEL_3D_PRODUCT_TYPE, '3DTiles'),
+  fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, DEM_SCHEME),
+  fetchServiceLink('3d', MODEL_3D_PRODUCT_ID, MODEL_3D_PRODUCT_TYPE, MODEL_3D_SCHEME),
 ]).then(([tileTemplate, demUrl, modelUrl]) => {
   const viewer = new Cesium.Viewer("cesiumContainer", {
     imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
