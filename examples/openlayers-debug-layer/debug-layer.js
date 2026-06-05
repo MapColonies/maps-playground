@@ -1,5 +1,5 @@
 import { TOKEN } from './config/common-config.js';
-import { PRODUCT_ID, PRODUCT_TYPE } from './config/raster-config.js';
+import { PRODUCT_ID, PRODUCT_TYPE, RASTER_SCHEME } from './config/raster-config.js';
 import { fetchServiceLink } from './utils/catalog-client.js';
 
 const map = new ol.Map({
@@ -13,7 +13,7 @@ const map = new ol.Map({
 
 const WMTSParser = new ol.format.WMTSCapabilities();
 
-fetchServiceLink('raster', PRODUCT_ID, PRODUCT_TYPE, 'WMTS')
+fetchServiceLink('raster', PRODUCT_ID, PRODUCT_TYPE, RASTER_SCHEME)
 	.then(url => fetch(`${url}?token=${TOKEN}`))
 	.then(response => response.text())
 	.then(text => {

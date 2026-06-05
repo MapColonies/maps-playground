@@ -1,4 +1,5 @@
 import { TOKEN } from './config/common-config.js';
+import { RASTER_SCHEME } from './config/raster-config.js';
 import { fetchServiceLink } from './utils/catalog-client.js';
 import { parseXml } from './utils/xml-utils.js';
 
@@ -25,7 +26,7 @@ export function extractWmtsTileTemplate(capabilitiesXml, layerName, format) {
 }
 
 export async function fetchWmtsTileTemplate(productId, productType, format) {
-  const capabilitiesUrl = await fetchServiceLink('raster', productId, productType, 'WMTS');
+  const capabilitiesUrl = await fetchServiceLink('raster', productId, productType, RASTER_SCHEME);
   const res = await fetch(`${capabilitiesUrl}?token=${TOKEN}`);
   if (!res.ok) {
     throw new Error(`Fetching WMTS capabilities failed: ${res.status}`);
