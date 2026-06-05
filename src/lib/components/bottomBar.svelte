@@ -7,12 +7,15 @@
 		BottomNavHeaderItem
 	} from 'flowbite-svelte';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import BottomHeaderItem from './bottomHeaderItem.svelte';
 	import classNames from 'classnames';
 
 	export let clients: { name: string; defaultItem: string }[];
 	export let items: { name: string; displayName?: string }[];
 	export let activeClient: string | undefined;
+
+	$: activeItem = $page.params.name;
 
 	$: outerDiv = classNames('-translate-x-0', 'dark:bg-gray-800', $$props.outerDiv);
 </script>
@@ -41,7 +44,12 @@
 		<BottomNavItem
 			on:click={() => goto('/demo/' + activeClient + '/' + item.name)}
 			id="group-{item.name}"
-			btnDefault="basis-0 items-center justify-center ml-[4px] mb-1 bg-gray-100 dark:bg-gray-600 rounded-lg p-4 text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700 group"
+			btnDefault={classNames(
+				'basis-0 items-center justify-center ml-[4px] mb-1 rounded-lg p-4 group',
+				item.name === activeItem
+					? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+					: 'bg-gray-100 dark:bg-gray-600 text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700'
+			)}
 		>
 			{item.displayName || item.name}
 			<!-- {#if item.displayName === 'basic openlayers'}
