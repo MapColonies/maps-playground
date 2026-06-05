@@ -9,6 +9,15 @@ const TYPENAMES = {
 
 const namespaceFor = (catalogKey) => `http://schema.mapcolonies.com/${catalogKey}`;
 
+/**
+ * Builds a CSW 2.0.2 GetRecords XML body that filters by productId and productType.
+ *
+ * @param {string} typename - CSW typeName for the catalog (e.g. 'mc:MCRasterRecord').
+ * @param {string} namespace - XML namespace URI for the catalog schema.
+ * @param {string} productId - Product identifier to match (e.g. 'blueMarble').
+ * @param {string} productType - Product type to match (e.g. 'Orthophoto').
+ * @returns {string} CSW GetRecords request XML.
+ */
 function buildGetRecordsBody(typename, namespace, productId, productType) {
 	return `<?xml version="1.0" encoding="UTF-8"?>
 <csw:GetRecords xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" service="CSW" maxRecords="1" startPosition="1" outputSchema="${namespace}" version="2.0.2" xmlns:mc="${namespace}">
@@ -32,8 +41,16 @@ function buildGetRecordsBody(typename, namespace, productId, productType) {
 </csw:GetRecords>`;
 }
 
+/**
+ * Parses a CSW response and collects every `<links>` element into a scheme → URL map.
+ *
+ * @param {string} xmlText - Raw CSW response XML.
+ * @param {string} namespace - Namespace URI used for `<links>` elements in the response.
+ * @returns {Record<string, string>} Map of scheme name (e.g. 'WMTS', 'WCS', '3DTiles') to service URL.
+ */
 function parseLinks(xmlText, namespace) {
 	const doc = parseXml(xmlText, 'CSW response');
+	// Each <links> node carries a `scheme` attribute and the service URL as text content.
 	return Array.from(doc.getElementsByTagNameNS(namespace, 'links')).reduce((acc, node) => {
 		const scheme = node.getAttribute('scheme');
 		if (scheme) acc[scheme] = (node.textContent || '').trim();
@@ -41,6 +58,15 @@ function parseLinks(xmlText, namespace) {
 	}, {});
 }
 
+/**
+ * Queries a MapColonies CSW catalog for a single record and returns it's link map.
+ *
+ * @param {'raster'|'3d'|'dem'} catalogKey - Which catalog to query.
+ * @param {string} productId - Product identifier to look up.
+ * @param {string} productType - Product type to look up.
+ * @returns {Promise<Record<string, string>>} Map of scheme → service URL exposed by the record.
+ * @throws If the catalog key is unknown or the CSW request fails.
+ */
 export async function fetchRecordLinks(catalogKey, productId, productType) {
 	const typename = TYPENAMES[catalogKey];
 	if (!typename) throw new Error(`Unknown catalog: ${catalogKey}`);
@@ -56,6 +82,17 @@ export async function fetchRecordLinks(catalogKey, productId, productType) {
 	return parseLinks(await res.text(), namespace);
 }
 
+/**
+ * Resolves the service URL for a specific scheme on a catalog record.
+ * Thin convenience wrapper around `fetchRecordLinks` for the common single-scheme lookup.
+ *
+ * @param {'raster'|'3d'|'dem'} catalogKey - Catalog the product lives in.
+ * @param {string} productId - Product identifier.
+ * @param {string} productType - Product type.
+ * @param {string} scheme - Scheme name to pick from the record (e.g. 'WMTS', 'WCS', '3DTiles').
+ * @returns {Promise<string>} Service URL for the requested scheme.
+ * @throws If the requested scheme is not advertised by the record; the error lists the schemes that are.
+ */
 export async function fetchServiceLink(catalogKey, productId, productType, scheme) {
 	const links = await fetchRecordLinks(catalogKey, productId, productType);
 	const url = links[scheme];
