@@ -33,11 +33,11 @@ export async function load({ params }): Promise<LoadResult> {
 	const index = await getDemoIndex();
 
 	if (client === undefined || index[client] === undefined) {
-		throw error(404, `no client named ${client} found.`)
+		throw error(404, `no client named ${client} found.`);
 	}
 
 	if (demoName === undefined || index[client][demoName] === undefined) {
-		throw error(404, `no demo named ${demoName} found in client ${client} found.`)
+		throw error(404, `no demo named ${demoName} found in client ${client} found.`);
 	}
 
 	return memoized(index, client);
