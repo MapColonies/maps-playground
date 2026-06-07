@@ -19,8 +19,8 @@ for (const item of [accessKeyId, secretAccessKey, awsEndpointUrl, bucket, indexK
 const client = new S3Client({
 	endpoint: awsEndpointUrl,
 	credentials: {
-		accessKeyId,
-		secretAccessKey
+		accessKeyId: accessKeyId as string,
+		secretAccessKey: secretAccessKey as string
 	},
 	forcePathStyle: true,
 	region: awsRegion ?? 'us-east-1'

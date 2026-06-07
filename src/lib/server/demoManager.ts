@@ -7,7 +7,7 @@ import Ajv from 'ajv/dist/jtd';
 
 const indexKey = env['INDEX_KEY'] as string;
 const [ttl, stale] = [env.ITEMS_TIMEOUT, env.ITEMS_STALE].map((value) => {
-	const parsed = parseInt(value);
+	const parsed = parseInt(value ?? '');
 	if (Number.isNaN(parsed)) {
 		return 0;
 	}
