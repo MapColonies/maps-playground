@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { base } from '$app/paths';
 	import type { File, Link } from '$lib/types';
 	export let files: File[];
 	export let links: Link[];
@@ -19,7 +20,7 @@
 		flemsInstance.set({
 			...flemsBaseConfig,
 			files,
-			links: links.map((link) => ({ ...link, url: window.location.origin + link.url }))
+			links: links.map((link) => ({ ...link, url: window.location.origin + base + link.url }))
 		});
 	}
 
@@ -28,7 +29,7 @@
 		flemsInstance = window.Flems(flems, {
 			...flemsBaseConfig,
 			files,
-			links: links.map((link) => ({ ...link, url: window.location.origin + link.url }))
+			links: links.map((link) => ({ ...link, url: window.location.origin + base + link.url }))
 		});
 	});
 </script>
