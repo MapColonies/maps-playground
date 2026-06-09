@@ -10,11 +10,10 @@ const parser = (urlTemplate) => {
 		.replace('{TileCol}', '{x}');
 };
 
-const layerName = `${PRODUCT_ID}-${PRODUCT_TYPE}`;
 const map = L.map('map', { crs: L.CRS.EPSG4326 }).setView([0.0, 0.0], 1);
 
-fetchWmtsTileTemplate(PRODUCT_ID, PRODUCT_TYPE).then((urlTemplate) => {
-	const parsedUrl = parser(urlTemplate);
-	const layer = L.tileLayer(parsedUrl + `?token=${TOKEN}`, { id: layerName });
+fetchWmtsTileTemplate(PRODUCT_ID, PRODUCT_TYPE).then(({ template, name }) => {
+	const parsedUrl = parser(template);
+	const layer = L.tileLayer(parsedUrl + `?token=${TOKEN}`, { id: name });
 	map.addLayer(layer);
 });

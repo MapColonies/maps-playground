@@ -36,7 +36,7 @@ OpenStreetMapNominatimGeocoder.prototype.geocode = function (input) {
 	});
 };
 
-fetchWmtsTileTemplate(PRODUCT_ID, PRODUCT_TYPE, LAYER_IMAGE_FORMAT).then((tileTemplate) => {
+fetchWmtsTileTemplate(PRODUCT_ID, PRODUCT_TYPE, LAYER_IMAGE_FORMAT).then(({ template, name }) => {
 	new Cesium.Viewer('cesiumContainer', {
 		vrButton: false,
 		homeButton: false,
@@ -46,12 +46,12 @@ fetchWmtsTileTemplate(PRODUCT_ID, PRODUCT_TYPE, LAYER_IMAGE_FORMAT).then((tileTe
 		shouldAnimate: false,
 		imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
 			url: new Cesium.Resource({
-				url: tileTemplate,
+				url: template,
 				queryParameters: {
 					token: TOKEN
 				}
 			}),
-			layer: `${PRODUCT_ID}-${PRODUCT_TYPE}`,
+			layer: name,
 			style: 'default',
 			format: LAYER_IMAGE_FORMAT,
 			tileMatrixSetID: 'WorldCRS84',

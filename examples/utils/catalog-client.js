@@ -42,32 +42,36 @@ function buildGetRecordsBody(typename, namespace, productId, productType) {
 }
 
 /**
- * Parses a CSW response and collects every `<links>` element into a scheme → URL map.
+ * Parses a CSW response and returns the service URL and layer name for the requested scheme.
  *
  * @param {string} xmlText - Raw CSW response XML.
  * @param {string} namespace - Namespace URI used for `<links>` elements in the response.
- * @returns {Record<string, string>} Map of scheme name (e.g. 'WMTS', 'WCS', '3DTiles') to service URL.
+ * @param {string} scheme - Scheme name to pick (e.g. 'WMTS', 'WCS', '3DTiles').
+ * @returns {{ url: string, name: string } | null} Service URL and layer name from the `name` attribute, or null if no matching `<links>` element is present.
  */
-function parseLinks(xmlText, namespace) {
+function parseLink(xmlText, namespace, scheme) {
 	const doc = parseXml(xmlText, 'CSW response');
-	// Each <links> node carries a `scheme` attribute and the service URL as text content.
-	return Array.from(doc.getElementsByTagNameNS(namespace, 'links')).reduce((acc, node) => {
-		const scheme = node.getAttribute('scheme');
-		if (scheme) acc[scheme] = (node.textContent || '').trim();
-		return acc;
-	}, {});
+	const node = Array.from(doc.getElementsByTagNameNS(namespace, 'links')).find(
+		(n) => n.getAttribute('scheme') === scheme
+	);
+	if (!node) return null;
+	return {
+		url: (node.textContent || '').trim(),
+		name: node.getAttribute('name') || ''
+	};
 }
 
 /**
- * Queries a MapColonies CSW catalog for a single record and returns it's link map.
+ * Resolves the service URL and layer name for a specific scheme on a catalog record.
  *
- * @param {'raster'|'3d'|'dem'} catalogKey - Which catalog to query.
- * @param {string} productId - Product identifier to look up.
- * @param {string} productType - Product type to look up.
- * @returns {Promise<Record<string, string>>} Map of scheme → service URL exposed by the record.
- * @throws If the catalog key is unknown or the CSW request fails.
+ * @param {'raster'|'3d'|'dem'} catalogKey - Catalog the product lives in.
+ * @param {string} productId - Product identifier.
+ * @param {string} productType - Product type.
+ * @param {string} scheme - Scheme name to pick from the record (e.g. 'WMTS', 'WCS', '3DTiles').
+ * @returns {Promise<{ url: string, name: string }>} Service URL and layer name from the matched `<links>` element.
+ * @throws If the catalog key is unknown, the CSW request fails, or the scheme is not advertised.
  */
-export async function fetchRecordLinks(catalogKey, productId, productType) {
+export async function fetchServiceLink(catalogKey, productId, productType, scheme) {
 	const typename = TYPENAMES[catalogKey];
 	if (!typename) throw new Error(`Unknown catalog: ${catalogKey}`);
 	const namespace = namespaceFor(catalogKey);
@@ -79,29 +83,9 @@ export async function fetchRecordLinks(catalogKey, productId, productType) {
 	if (!res.ok) {
 		throw new Error(`CSW ${catalogKey} ${productId} failed: ${res.status}`);
 	}
-	return parseLinks(await res.text(), namespace);
-}
-
-/**
- * Resolves the service URL for a specific scheme on a catalog record.
- * Thin convenience wrapper around `fetchRecordLinks` for the common single-scheme lookup.
- *
- * @param {'raster'|'3d'|'dem'} catalogKey - Catalog the product lives in.
- * @param {string} productId - Product identifier.
- * @param {string} productType - Product type.
- * @param {string} scheme - Scheme name to pick from the record (e.g. 'WMTS', 'WCS', '3DTiles').
- * @returns {Promise<string>} Service URL for the requested scheme.
- * @throws If the requested scheme is not advertised by the record; the error lists the schemes that are.
- */
-export async function fetchServiceLink(catalogKey, productId, productType, scheme) {
-	const links = await fetchRecordLinks(catalogKey, productId, productType);
-	const url = links[scheme];
-	if (!url) {
-		throw new Error(
-			`No "${scheme}" link in ${catalogKey}/${productId}. Available: ${Object.keys(links).join(
-				', '
-			)}`
-		);
+	const link = parseLink(await res.text(), namespace, scheme);
+	if (!link) {
+		throw new Error(`No "${scheme}" link in ${catalogKey}/${productId}`);
 	}
-	return url;
+	return link;
 }

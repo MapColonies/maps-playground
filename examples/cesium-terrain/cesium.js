@@ -15,16 +15,16 @@ import { fetchWmtsTileTemplate } from './utils/wmts-utils.js';
 Promise.all([
 	fetchWmtsTileTemplate(RASTER_PRODUCT_ID, RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT),
 	fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, DEM_SCHEME)
-]).then(([tileTemplate, demUrl]) => {
+]).then(([raster, dem]) => {
 	const viewer = new Cesium.Viewer('cesiumContainer', {
 		imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
 			url: new Cesium.Resource({
-				url: tileTemplate,
+				url: raster.template,
 				queryParameters: {
 					token: TOKEN
 				}
 			}),
-			layer: `${RASTER_PRODUCT_ID}-${RASTER_PRODUCT_TYPE}`,
+			layer: raster.name,
 			style: 'default',
 			format: LAYER_IMAGE_FORMAT,
 			tileMatrixSetID: 'newGrids',
@@ -32,7 +32,7 @@ Promise.all([
 		}),
 		terrainProvider: new Cesium.CesiumTerrainProvider({
 			url: new Cesium.Resource({
-				url: demUrl,
+				url: dem.url,
 				queryParameters: {
 					token: TOKEN
 				}
@@ -50,16 +50,16 @@ Promise.all([
 	});
 
 	fetchWmtsTileTemplate('WORLD_MAP_BASE_THIN', 'RasterVectorBest', 'image/png').then(
-		(secondTemplate) => {
+		({ template, name }) => {
 			viewer.imageryLayers.addImageryProvider(
 				new Cesium.WebMapTileServiceImageryProvider({
 					url: new Cesium.Resource({
-						url: secondTemplate,
+						url: template,
 						queryParameters: {
 							token: TOKEN
 						}
 					}),
-					layer: 'WORLD_MAP_BASE_THIN-RasterVectorBest',
+					layer: name,
 					style: 'default',
 					format: 'image/png',
 					tileMatrixSetID: 'newGrids',

@@ -21,16 +21,16 @@ Promise.all([
 	fetchWmtsTileTemplate(RASTER_PRODUCT_ID, RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT),
 	fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, DEM_SCHEME),
 	fetchServiceLink('3d', MODEL_3D_PRODUCT_ID, MODEL_3D_PRODUCT_TYPE, MODEL_3D_SCHEME)
-]).then(([tileTemplate, demUrl, modelUrl]) => {
+]).then(([raster, dem, model]) => {
 	const viewer = new Cesium.Viewer('cesiumContainer', {
 		imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
 			url: new Cesium.Resource({
-				url: tileTemplate,
+				url: raster.template,
 				queryParameters: {
 					token: TOKEN
 				}
 			}),
-			layer: `${RASTER_PRODUCT_ID}-${RASTER_PRODUCT_TYPE}`,
+			layer: raster.name,
 			style: 'default',
 			format: LAYER_IMAGE_FORMAT,
 			tileMatrixSetID: 'WorldCRS84',
@@ -38,7 +38,7 @@ Promise.all([
 		}),
 		terrainProvider: new Cesium.CesiumTerrainProvider({
 			url: new Cesium.Resource({
-				url: demUrl,
+				url: dem.url,
 				queryParameters: {
 					token: TOKEN
 				}
@@ -49,7 +49,7 @@ Promise.all([
 	viewer.scene.primitives.add(
 		new Cesium.Cesium3DTileset({
 			url: new Cesium.Resource({
-				url: modelUrl,
+				url: model.url,
 				queryParameters: {
 					token: TOKEN
 				}
