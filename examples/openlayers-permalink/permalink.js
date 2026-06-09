@@ -21,12 +21,15 @@ if (window.location.hash !== '') {
 const WMTSParser = new ol.format.WMTSCapabilities();
 
 fetchServiceLink('raster', PRODUCT_ID, PRODUCT_TYPE, RASTER_SCHEME)
-	.then((url) => fetch(`${url}?token=${TOKEN}`))
-	.then((response) => response.text())
-	.then((text) => {
+	.then(({ url, name }) =>
+		fetch(`${url}?token=${TOKEN}`)
+			.then((response) => response.text())
+			.then((text) => ({ text, name }))
+	)
+	.then(({ text, name }) => {
 		const results = WMTSParser.read(text);
 		const options = ol.source.WMTS.optionsFromCapabilities(results, {
-			layer: `${PRODUCT_ID}-${PRODUCT_TYPE}`
+			layer: name
 		});
 		options.urls = options.urls.map((url) => {
 			return url.concat(`?token=${TOKEN}`);

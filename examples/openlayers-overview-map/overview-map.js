@@ -3,18 +3,20 @@ import { PRODUCT_ID, PRODUCT_TYPE, RASTER_SCHEME } from './config/raster-config.
 import { fetchServiceLink } from './utils/catalog-client.js';
 
 const WMTSParser = new ol.format.WMTSCapabilities();
-const layerName = `${PRODUCT_ID}-${PRODUCT_TYPE}`;
 
 fetchServiceLink('raster', PRODUCT_ID, PRODUCT_TYPE, RASTER_SCHEME)
-	.then((url) => fetch(`${url}?token=${TOKEN}`))
-	.then((response) => response.text())
-	.then((text) => {
+	.then(({ url, name }) =>
+		fetch(`${url}?token=${TOKEN}`)
+			.then((response) => response.text())
+			.then((text) => ({ text, name }))
+	)
+	.then(({ text, name }) => {
 		const results = WMTSParser.read(text);
 		const options = ol.source.WMTS.optionsFromCapabilities(results, {
-			layer: layerName
+			layer: name
 		});
 		const optionsMiniMap = ol.source.WMTS.optionsFromCapabilities(results, {
-			layer: layerName
+			layer: name
 		});
 		options.urls = options.urls.map((url) => {
 			return url.concat(`?token=${TOKEN}`);

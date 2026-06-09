@@ -42,22 +42,28 @@ export function extractWmtsTileTemplate(capabilitiesXml, layerName, format) {
 
 /**
  * Resolves the raster catalog entry for a product, fetches its WMTS capabilities,
- * and returns the tile URL template for the `${productId}-${productType}` layer.
+ * and returns the tile URL template along with the layer name from the catalog.
  *
  * Convenience helper that wraps the full catalog → capabilities → template chain.
  *
  * @param {string} productId - Raster product identifier.
  * @param {string} productType - Raster product type.
  * @param {string} [format] - Optional MIME type filter passed to `extractWmtsTileTemplate`.
- * @returns {Promise<string>} Tile URL template (still contains WMTS placeholders).
+ * @returns {Promise<{ template: string, name: string }>} Tile URL template (still contains WMTS placeholders) and the layer name reported by the catalog.
  * @throws If the catalog lookup, capabilities fetch, or layer extraction fails.
  */
 export async function fetchWmtsTileTemplate(productId, productType, format) {
-	const capabilitiesUrl = await fetchServiceLink('raster', productId, productType, RASTER_SCHEME);
+	const { url: capabilitiesUrl, name } = await fetchServiceLink(
+		'raster',
+		productId,
+		productType,
+		RASTER_SCHEME
+	);
 	// Capabilities endpoint is token-gated; same token is later used per-tile by the caller.
 	const res = await fetch(`${capabilitiesUrl}?token=${TOKEN}`);
 	if (!res.ok) {
 		throw new Error(`Fetching WMTS capabilities failed: ${res.status}`);
 	}
-	return extractWmtsTileTemplate(await res.text(), `${productId}-${productType}`, format);
+	const template = extractWmtsTileTemplate(await res.text(), name, format);
+	return { template, name };
 }
