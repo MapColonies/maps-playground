@@ -1,6 +1,5 @@
-export var MAPCOLONIES_TILES_URL = 'https://tiles.mapcolonies.net';
-export var MAPCOLONIES_QUERY_URL = 'https://query.mapcolonies.net';
-export var MAPCOLONIES_GEOCODING_URL = 'https://geocoding.mapcolonies.net';
-export var MAPCOLONIES_CATALOG_URL = 'https://catalog.mapcolonies.net';
-export var TOKEN =
-	'eyJhbGciOiJSUzI1NiIsImtpZCI6Im1hcC1jb2xvbmllcy1pbnQifQ.eyJkIjpbInJhc3RlciIsInZlY3RvciIsIjNkIiwiZGVtIl0sImlhdCI6MTcxMTU2MDY0NSwic3ViIjoiYmFyYWsiLCJpc3MiOiJtYXBjb2xvbmllcy10b2tlbi1jbGkifQ.qupSnHv9H1N9A9iKS5CCNO7A6LKipR3TpFYz_ViV2iqKWIIv3pUlQ_SFESubZiL-TuRFBaxzC8HqUmzV1Q0F3M209QzSOhPyzGme-oFQncqfJstKm_ji8Q6weR9RkZVzfssRed1C6FY1D4bHH-q8qLBKnorU_S0aYbHMwawHLTAmKoDBPetADLT64doxLy5kCpgL0dPQLdXQKIlLqw1whXsk_x4UG1BYtD-Zb0lxJ_FkaZWWfU5cpgFgDQo7gI2q0oUlxZPqCmpiKhq3njWZWmDv-G8S8XcNNeml94dVjHnqFbc_DKxHLXV2QuIS3koPUTHdyctaHtxaCEKW0XHOfA';
+export var MAPCOLONIES_TILES_URL = 'TILES_URL';
+export var MAPCOLONIES_QUERY_URL = 'QUERY_URL';
+export var MAPCOLONIES_GEOCODING_URL = 'GEOCODING_URL';
+export var MAPCOLONIES_CATALOG_URL = 'CATALOG_URL';
+export var TOKEN = 'TOKEN';
