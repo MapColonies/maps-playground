@@ -6,16 +6,16 @@ import { fetchWmtsTileTemplate } from './utils/wmts-utils.js';
 Promise.all([
 	fetchWmtsTileTemplate(PRODUCT_ID, PRODUCT_TYPE, LAYER_IMAGE_FORMAT),
 	fetchWmtsTileTemplate('OSM', 'RasterVectorBest', LAYER_IMAGE_FORMAT)
-]).then(([mainTemplate, secondTemplate]) => {
+]).then(([main, second]) => {
 	const viewer = new Cesium.Viewer('cesiumContainer', {
 		imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
 			url: new Cesium.Resource({
-				url: mainTemplate,
+				url: main.template,
 				queryParameters: {
 					token: TOKEN
 				}
 			}),
-			layer: `${PRODUCT_ID}-${PRODUCT_TYPE}`,
+			layer: main.name,
 			style: 'default',
 			format: LAYER_IMAGE_FORMAT,
 			tileMatrixSetID: 'WorldCRS84',
@@ -29,12 +29,12 @@ Promise.all([
 	const secondLayer = layers.addImageryProvider(
 		new Cesium.WebMapTileServiceImageryProvider({
 			url: new Cesium.Resource({
-				url: secondTemplate,
+				url: second.template,
 				queryParameters: {
 					token: TOKEN
 				}
 			}),
-			layer: 'OSM-RasterVectorBest',
+			layer: second.name,
 			style: 'default',
 			format: LAYER_IMAGE_FORMAT,
 			tileMatrixSetID: 'WorldCRS84',
