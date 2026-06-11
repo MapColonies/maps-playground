@@ -576,19 +576,21 @@ Promise.all([
 	fetchServiceLink('3d', MODEL_3D_PRODUCT_ID, MODEL_3D_PRODUCT_TYPE, MODEL_3D_SCHEME)
 ]).then(([raster, dem, model]) => {
 	viewer = new Cesium.Viewer('cesiumContainer', {
-		imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
-			url: new Cesium.Resource({
-				url: raster.template,
-				queryParameters: {
-					token: TOKEN
-				}
-			}),
-			layer: raster.name,
-			style: 'default',
-			format: LAYER_IMAGE_FORMAT,
-			tileMatrixSetID: 'WorldCRS84',
-			tilingScheme: new Cesium.GeographicTilingScheme()
-		}),
+		baseLayer: new Cesium.ImageryLayer(
+			new Cesium.WebMapTileServiceImageryProvider({
+				url: new Cesium.Resource({
+					url: raster.template,
+					queryParameters: {
+						token: TOKEN
+					}
+				}),
+				layer: raster.name,
+				style: 'default',
+				format: LAYER_IMAGE_FORMAT,
+				tileMatrixSetID: 'WorldCRS84',
+				tilingScheme: new Cesium.GeographicTilingScheme()
+			})
+		),
 		terrainProvider: new Cesium.CesiumTerrainProvider({
 			url: new Cesium.Resource({
 				url: dem.url,

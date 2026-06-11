@@ -17,19 +17,21 @@ Promise.all([
 	fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, DEM_SCHEME)
 ]).then(([raster, dem]) => {
 	const viewer = new Cesium.Viewer('cesiumContainer', {
-		imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
-			url: new Cesium.Resource({
-				url: raster.template,
-				queryParameters: {
-					token: TOKEN
-				}
-			}),
-			layer: raster.name,
-			style: 'default',
-			format: LAYER_IMAGE_FORMAT,
-			tileMatrixSetID: 'newGrids',
-			tilingScheme: new Cesium.GeographicTilingScheme()
-		}),
+		baseLayer: new Cesium.ImageryLayer(
+			new Cesium.WebMapTileServiceImageryProvider({
+				url: new Cesium.Resource({
+					url: raster.template,
+					queryParameters: {
+						token: TOKEN
+					}
+				}),
+				layer: raster.name,
+				style: 'default',
+				format: LAYER_IMAGE_FORMAT,
+				tileMatrixSetID: 'newGrids',
+				tilingScheme: new Cesium.GeographicTilingScheme()
+			})
+		),
 		terrainProvider: new Cesium.CesiumTerrainProvider({
 			url: new Cesium.Resource({
 				url: dem.url,
