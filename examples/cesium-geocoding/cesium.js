@@ -44,19 +44,21 @@ fetchWmtsTileTemplate(PRODUCT_ID, PRODUCT_TYPE, LAYER_IMAGE_FORMAT).then(({ temp
 		timeline: false,
 		navigationHelpButton: false,
 		shouldAnimate: false,
-		imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
-			url: new Cesium.Resource({
-				url: template,
-				queryParameters: {
-					token: TOKEN
-				}
-			}),
-			layer: name,
-			style: 'default',
-			format: LAYER_IMAGE_FORMAT,
-			tileMatrixSetID: 'WorldCRS84',
-			tilingScheme: new Cesium.GeographicTilingScheme()
-		}),
+		baseLayer: new Cesium.ImageryLayer(
+			new Cesium.WebMapTileServiceImageryProvider({
+				url: new Cesium.Resource({
+					url: template,
+					queryParameters: {
+						token: TOKEN
+					}
+				}),
+				layer: name,
+				style: 'default',
+				format: LAYER_IMAGE_FORMAT,
+				tileMatrixSetID: 'WorldCRS84',
+				tilingScheme: new Cesium.GeographicTilingScheme()
+			})
+		),
 		geocoder: new OpenStreetMapNominatimGeocoder()
 	});
 });

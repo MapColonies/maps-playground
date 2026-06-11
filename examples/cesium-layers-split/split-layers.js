@@ -8,19 +8,21 @@ Promise.all([
 	fetchWmtsTileTemplate('OSM', 'RasterVectorBest', LAYER_IMAGE_FORMAT)
 ]).then(([main, second]) => {
 	const viewer = new Cesium.Viewer('cesiumContainer', {
-		imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
-			url: new Cesium.Resource({
-				url: main.template,
-				queryParameters: {
-					token: TOKEN
-				}
-			}),
-			layer: main.name,
-			style: 'default',
-			format: LAYER_IMAGE_FORMAT,
-			tileMatrixSetID: 'WorldCRS84',
-			tilingScheme: new Cesium.GeographicTilingScheme()
-		}),
+		baseLayer: new Cesium.ImageryLayer(
+			new Cesium.WebMapTileServiceImageryProvider({
+				url: new Cesium.Resource({
+					url: main.template,
+					queryParameters: {
+						token: TOKEN
+					}
+				}),
+				layer: main.name,
+				style: 'default',
+				format: LAYER_IMAGE_FORMAT,
+				tileMatrixSetID: 'WorldCRS84',
+				tilingScheme: new Cesium.GeographicTilingScheme()
+			})
+		),
 		baseLayerPicker: false,
 		infoBox: false
 	});
