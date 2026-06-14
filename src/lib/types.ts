@@ -11,6 +11,7 @@ export interface Link {
 
 export interface DemoMetadata {
 	displayName?: string;
+	description?: string;
 	image?: string;
 	files: string[];
 	links: Link[];
