@@ -15,7 +15,14 @@ import { fetchWmtsTileTemplate } from './utils/wmts-utils.js';
 Promise.all([
 	fetchWmtsTileTemplate(RASTER_PRODUCT_ID, RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT),
 	fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, DEM_SCHEME)
-]).then(([raster, dem]) => {
+]).then(async ([raster, dem]) => {
+	const terrainProvider = await Cesium.CesiumTerrainProvider.fromUrl(
+		new Cesium.Resource({
+			url: dem.url,
+			queryParameters: { token: TOKEN }
+		})
+	);
+
 	const viewer = new Cesium.Viewer('cesiumContainer', {
 		baseLayer: new Cesium.ImageryLayer(
 			new Cesium.WebMapTileServiceImageryProvider({
@@ -32,14 +39,7 @@ Promise.all([
 				tilingScheme: new Cesium.GeographicTilingScheme()
 			})
 		),
-		terrainProvider: new Cesium.CesiumTerrainProvider({
-			url: new Cesium.Resource({
-				url: dem.url,
-				queryParameters: {
-					token: TOKEN
-				}
-			})
-		})
+		terrainProvider
 	});
 
 	viewer.camera.flyTo({

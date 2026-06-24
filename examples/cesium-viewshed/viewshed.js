@@ -574,7 +574,27 @@ Promise.all([
 	fetchWmtsTileTemplate(RASTER_PRODUCT_ID, RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT),
 	fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, DEM_SCHEME),
 	fetchServiceLink('3d', MODEL_3D_PRODUCT_ID, MODEL_3D_PRODUCT_TYPE, MODEL_3D_SCHEME)
-]).then(([raster, dem, model]) => {
+]).then(async ([raster, dem, model]) => {
+	const demResource = new Cesium.Resource({
+		url: dem.url,
+		queryParameters: { token: TOKEN }
+	});
+	const modelResource = new Cesium.Resource({
+		url: model.url,
+		queryParameters: { token: TOKEN }
+	});
+
+	const [terrainProvider, tileset] = await Promise.all([
+		Cesium.CesiumTerrainProvider.fromUrl(demResource),
+		Cesium.Cesium3DTileset.fromUrl(modelResource, {
+			maximumScreenSpaceError: 5,
+			cullRequestsWhileMovingMultiplier: 120,
+			preloadFlightDestination: true,
+			preferLeaves: true,
+			skipLevelOfDetail: true
+		})
+	]);
+
 	viewer = new Cesium.Viewer('cesiumContainer', {
 		baseLayer: new Cesium.ImageryLayer(
 			new Cesium.WebMapTileServiceImageryProvider({
@@ -591,31 +611,10 @@ Promise.all([
 				tilingScheme: new Cesium.GeographicTilingScheme()
 			})
 		),
-		terrainProvider: new Cesium.CesiumTerrainProvider({
-			url: new Cesium.Resource({
-				url: dem.url,
-				queryParameters: {
-					token: TOKEN
-				}
-			})
-		})
+		terrainProvider
 	});
 
-	viewer.scene.primitives.add(
-		new Cesium.Cesium3DTileset({
-			url: new Cesium.Resource({
-				url: model.url,
-				queryParameters: {
-					token: TOKEN
-				}
-			}),
-			maximumScreenSpaceError: 5,
-			cullRequestsWhileMovingMultiplier: 120,
-			preloadFlightDestination: true,
-			preferLeaves: true,
-			skipLevelOfDetail: true
-		})
-	);
+	viewer.scene.primitives.add(tileset);
 
 	viewer.camera.flyTo({
 		destination: pointA,
