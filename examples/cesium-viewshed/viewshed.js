@@ -5,9 +5,9 @@ import {
 	LAYER_IMAGE_FORMAT
 } from './config/raster-config.js';
 import {
-	PRODUCT_ID as DEM_PRODUCT_ID,
-	PRODUCT_TYPE as DEM_PRODUCT_TYPE,
-	DEM_SCHEME
+	TERRAIN_PRODUCT_ID as DEM_TERRAIN_PRODUCT_ID,
+	TERRAIN_PRODUCT_TYPE as DEM_TERRAIN_PRODUCT_TYPE,
+	DEM_TERRAIN_SCHEME
 } from './config/dem-config.js';
 import {
 	PRODUCT_ID as MODEL_3D_PRODUCT_ID,
@@ -572,7 +572,7 @@ let pointB = Cesium.Cartesian3.fromDegrees(35.200014, 33.268811, 40); // Empire 
 let viewer;
 Promise.all([
 	fetchWmtsTileTemplate(RASTER_PRODUCT_ID, RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT),
-	fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, DEM_SCHEME),
+	fetchServiceLink('3d', DEM_TERRAIN_PRODUCT_ID, DEM_TERRAIN_PRODUCT_TYPE, DEM_TERRAIN_SCHEME),
 	fetchServiceLink('3d', MODEL_3D_PRODUCT_ID, MODEL_3D_PRODUCT_TYPE, MODEL_3D_SCHEME)
 ]).then(async ([raster, dem, model]) => {
 	const demResource = new Cesium.Resource({
