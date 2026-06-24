@@ -272,7 +272,7 @@
 			]
 		},
 		"3D Model": {
-			"displayName": "3D Model (South Lebanon)",
+			"displayName": "3D Model",
 			"description": "Composes the full MapColonies 3D stack: WMTS imagery, DEM terrain and a photo-realistic 3D Tiles mesh, all aligned in one scene.\n\nReference for end-to-end 3D scene assembly — shows the loading order and provider config that makes imagery, terrain and meshes line up correctly.",
 			"files": [
 				"cesium-3d/3d-model.js",
