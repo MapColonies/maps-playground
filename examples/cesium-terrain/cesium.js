@@ -5,17 +5,24 @@ import {
 	LAYER_IMAGE_FORMAT
 } from './config/raster-config.js';
 import {
-	PRODUCT_ID as DEM_PRODUCT_ID,
-	PRODUCT_TYPE as DEM_PRODUCT_TYPE,
-	DEM_SCHEME
+	TERRAIN_PRODUCT_ID as DEM_TERRAIN_PRODUCT_ID,
+	TERRAIN_PRODUCT_TYPE as DEM_TERRAIN_PRODUCT_TYPE,
+	DEM_TERRAIN_SCHEME
 } from './config/dem-config.js';
 import { fetchServiceLink } from './utils/catalog-client.js';
 import { fetchWmtsTileTemplate } from './utils/wmts-utils.js';
 
 Promise.all([
 	fetchWmtsTileTemplate(RASTER_PRODUCT_ID, RASTER_PRODUCT_TYPE, LAYER_IMAGE_FORMAT),
-	fetchServiceLink('dem', DEM_PRODUCT_ID, DEM_PRODUCT_TYPE, DEM_SCHEME)
-]).then(([raster, dem]) => {
+	fetchServiceLink('3d', DEM_TERRAIN_PRODUCT_ID, DEM_TERRAIN_PRODUCT_TYPE, DEM_TERRAIN_SCHEME)
+]).then(async ([raster, dem]) => {
+	const terrainProvider = await Cesium.CesiumTerrainProvider.fromUrl(
+		new Cesium.Resource({
+			url: dem.url,
+			queryParameters: { token: TOKEN }
+		})
+	);
+
 	const viewer = new Cesium.Viewer('cesiumContainer', {
 		baseLayer: new Cesium.ImageryLayer(
 			new Cesium.WebMapTileServiceImageryProvider({
@@ -28,18 +35,11 @@ Promise.all([
 				layer: raster.name,
 				style: 'default',
 				format: LAYER_IMAGE_FORMAT,
-				tileMatrixSetID: 'newGrids',
+				tileMatrixSetID: 'WorldCRS84',
 				tilingScheme: new Cesium.GeographicTilingScheme()
 			})
 		),
-		terrainProvider: new Cesium.CesiumTerrainProvider({
-			url: new Cesium.Resource({
-				url: dem.url,
-				queryParameters: {
-					token: TOKEN
-				}
-			})
-		})
+		terrainProvider
 	});
 
 	viewer.camera.flyTo({
@@ -50,24 +50,4 @@ Promise.all([
 			roll: 0.0
 		}
 	});
-
-	fetchWmtsTileTemplate('WORLD_MAP_BASE_THIN', 'RasterVectorBest', 'image/png').then(
-		({ template, name }) => {
-			viewer.imageryLayers.addImageryProvider(
-				new Cesium.WebMapTileServiceImageryProvider({
-					url: new Cesium.Resource({
-						url: template,
-						queryParameters: {
-							token: TOKEN
-						}
-					}),
-					layer: name,
-					style: 'default',
-					format: 'image/png',
-					tileMatrixSetID: 'newGrids',
-					tilingScheme: new Cesium.GeographicTilingScheme()
-				})
-			);
-		}
-	);
 });
