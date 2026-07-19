@@ -5,7 +5,16 @@
 	"packages": {
 		".": {
 			"extra-files": [
-				"helm/Chart.yaml"
+				{
+					"type": "yaml",
+					"path": "helm/Chart.yaml",
+					"jsonpath": "$.version"
+				},
+				{
+					"type": "yaml",
+					"path": "helm/Chart.yaml",
+					"jsonpath": "$.appVersion"
+				}
 			]
 		}
 	}
