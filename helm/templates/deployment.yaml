@@ -1,0 +1,82 @@
+{{- $releaseName := .Release.Name -}}
+{{- $chartName := include "developer-portal.name" . -}}
+{{- $cloudProviderFlavor := include "developer-portal.cloudProviderFlavor" . -}}
+{{- $cloudProviderDockerRegistryUrl := include "developer-portal.cloudProviderDockerRegistryUrl" . -}}
+{{- $cloudProviderImagePullSecretName := include "developer-portal.cloudProviderImagePullSecretName" . -}}
+{{- $imageTag := include "developer-portal.tag" . -}}
+{{- if .Values.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $releaseName }}-{{ $chartName }}
+  labels:
+    app: {{ $chartName }}
+    component: {{ $chartName }}
+    environment: {{ include "developer-portal.environment" . }}
+    release: {{ $releaseName }}
+    {{- include "developer-portal.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ $chartName }}
+      release: {{ $releaseName }}
+      run: {{ $releaseName }}-{{ $chartName }}
+      {{- include "developer-portal.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ $chartName }}
+        release: {{ $releaseName }}
+        run: {{ $releaseName }}-{{ $chartName }}
+        {{- include "developer-portal.selectorLabels" . | nindent 8 }}
+      {{- if .Values.resetOnConfigChange }}
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- end }}
+    spec:
+    {{- if $cloudProviderImagePullSecretName }}
+      imagePullSecrets:
+        - name: {{ $cloudProviderImagePullSecretName | quote }}
+    {{- end }}
+      containers:
+        - name: {{ $releaseName }}-{{ $chartName }}-deployment
+          {{- with .Values.image }}
+          image: {{ .repository }}:{{ $imageTag }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+          env:
+            # - name: SERVER_PORT
+            #   value: {{ .Values.env.targetPort | quote }}
+            - name: NODE_OPTIONS
+              value: 'no-network-family-autoselection'
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: '0'
+          envFrom:
+            - configMapRef:
+                name: {{ $releaseName }}-{{ $chartName }}-configmap
+          ports:
+            - name: http
+              containerPort: {{ .Values.env.targetPort }}
+              protocol: {{ .Values.env.protocol }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            httpGet:
+              path: /
+              port: {{ .Values.env.targetPort }}
+          {{- if .Values.resources.enabled }}
+          resources:
+            {{- toYaml .Values.resources.value | nindent 12 }}
+          {{- end }}
+          # volumeMounts:
+          #   - name: nginx-config
+          #     mountPath: /etc/nginx/conf.d/default.conf
+          #     subPath: default.conf
+      # volumes:
+      #   - name: nginx-config
+      #     configMap:
+      #       name: {{ $releaseName }}-{{ $chartName }}-configmap
+      #       items:
+      #         - key: default.conf
+      #           path: default.conf
+{{- end -}}
