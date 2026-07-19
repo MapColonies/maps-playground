@@ -49,6 +49,18 @@ jobs:
       - name: Run svelte-check
         run: npm run check
 
+  helm-lint:
+    name: Run Helm lint Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Project Git repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Helm Lint Checks
+        uses: MapColonies/shared-workflows/actions/helm-lint@helm-lint-v1
+
   security:
     runs-on: ubuntu-latest
     steps:
