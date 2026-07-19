@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0](https://github.com/MapColonies/maps-playground/compare/v1.0.0...v1.1.0) (2026-07-19)
+
+
+### Features
+
+* add helm chart ([#2](https://github.com/MapColonies/maps-playground/issues/2)) ([b74c458](https://github.com/MapColonies/maps-playground/commit/b74c458a8f8f20895882b892e0a79b57425d3415))
+
+
+### Bug Fixes
+
+* **examples:** use correct syntax for loading 3dtiles in cesium ([ee2952d](https://github.com/MapColonies/maps-playground/commit/ee2952d56134d7f8c44163f0424aa296147697ff))
+* **examples:** use correct syntax for loading 3dtiles in cesium ([#10](https://github.com/MapColonies/maps-playground/issues/10)) ([0c8fe74](https://github.com/MapColonies/maps-playground/commit/0c8fe746c3272d035721f114d9e1a5fccde74aad))
+* **examples:** wrong parameters used for getting terrain from catalog ([49ab1be](https://github.com/MapColonies/maps-playground/commit/49ab1bee3cce72b46dfed26fa2ab5601411f06f8))
+
 ## 1.0.0 (2026-06-15)
 
 
