@@ -1,0 +1,30 @@
+<div id="map"></div>
+<form>
+	<label for="type">Geometry Type</label>
+	<select id="type">
+		<option value="Point">Point</option>
+		<option value="LineString">LineString</option>
+		<option value="Polygon">Polygon</option>
+		<option value="Circle">Circle Geometry</option>
+		<option value="Geodesic" selected>Geodesic Geometry</option>
+	</select>
+</form>
+
+<div class="span12">
+	<p id="shortdesc">Example of using Draw and Modify interactions for geodesic circles.</p>
+	<div id="docs">
+		<p>
+			Example of using the <code>ol/interaction/Draw</code> interaction with a custom geometry
+			function together with the <code>ol/interaction/Modify</code> interaction to draw and modify
+			geodesic circles (a <code>ol/geom/Polygon#circular</code> polygon representing a circle on the
+			surface of the Earth&#39;s sphere). The polygon is placed in a
+			<code>ol/geom/GeometryCollection</code> together with a <code>ol/geom/Point</code> which
+			allows the Modify interaction to adjust the circle center as well as the radius. Custom style
+			functions ensure the correct final geometry is displayed throughout.
+			<code>ol/geom/Circle</code> projected (planar) geometries can also be drawn and modified. The
+			difference between geodesic and projected circles can be seen when their centers are moved
+			between northern and southern latitudes in the Web Mercator projection. The
+			<code>ol/interaction/Snap</code> interaction can be used to create concentric circles.
+		</p>
+	</div>
+</div>

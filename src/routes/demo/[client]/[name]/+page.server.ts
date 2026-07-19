@@ -1,9 +1,13 @@
 import { getDemoIndex, getFile } from '$lib/server/demoManager.js';
 import type { Link, File } from '$lib/types';
 
-export async function load({
-	params
-}): Promise<{ links: Link[]; files: File[]; demoName: string }> {
+export async function load({ params }): Promise<{
+	links: Link[];
+	files: File[];
+	demoName: string;
+	displayName?: string;
+	description?: string;
+}> {
 	const { client, name: demoName } = params;
 
 	const demoMetadata = (await getDemoIndex())[client][demoName];
@@ -15,5 +19,11 @@ export async function load({
 		})
 	);
 
-	return { links: demoMetadata.links, files, demoName };
+	return {
+		links: demoMetadata.links,
+		files,
+		demoName,
+		displayName: demoMetadata.displayName,
+		description: demoMetadata.description
+	};
 }

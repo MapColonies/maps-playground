@@ -20,7 +20,7 @@
 			<NavLi href={env.PUBLIC_PUZZLE_HREF} target="_blank">Map Puzzle</NavLi>
 		</NavUl>
 		<div class="flex md:order-2">
-			<DarkMode initialTheme='dark'/>
+			<DarkMode initialTheme="dark" />
 		</div>
 	</Navbar>
 	<div class="flex-auto overflow-y-auto">

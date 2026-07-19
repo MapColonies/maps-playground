@@ -2,8 +2,6 @@ import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { error } from '@sveltejs/kit';
 
-export const prerender = true;
-
 export async function load(): Promise<{
 	files: { name: string; path: string; urlPath: string }[];
 }> {
@@ -15,8 +13,8 @@ export async function load(): Promise<{
 				.filter((file) => file.isFile())
 				.map((file) => ({
 					name: file.name,
-					path: file.path,
-					urlPath: join(file.path.substring(6), file.name)
+					path: file.parentPath,
+					urlPath: join(file.parentPath.substring(6), file.name)
 				}))
 		};
 	} catch (err) {

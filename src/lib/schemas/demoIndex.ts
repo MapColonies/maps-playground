@@ -6,6 +6,9 @@ const demoMetadataSchema: JTDSchemaType<DemoMetadata> = {
 		displayName: {
 			type: 'string'
 		},
+		description: {
+			type: 'string'
+		},
 		image: {
 			type: 'string'
 		}
