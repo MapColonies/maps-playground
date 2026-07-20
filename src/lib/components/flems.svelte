@@ -17,8 +17,11 @@
 
 	function wireOnChange() {
 		if (!flemsInstance || !onChange) return;
-		flemsInstance.onchange = (state: { files: File[] }) =>
-			onChange?.(state.files.map((f) => ({ name: f.name, content: f.content })));
+		// Flems' `onchange` is a registrar you CALL to install a handler,
+		// not a settable property (`onchange: fn => actions.onchange = fn`).
+		flemsInstance.onchange((state: { files: File[] }) =>
+			onChange?.(state.files.map((f) => ({ name: f.name, content: f.content })))
+		);
 	}
 
 	$: if (flemsInstance) {

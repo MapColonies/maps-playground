@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { env } from '$env/dynamic/public';
 	import Flems from '$lib/components/flems.svelte';
@@ -8,27 +8,45 @@
 
 	export let data;
 
-	const debounceMs = Number.parseInt(env.PUBLIC_CACHE_DEBOUNCE_MS ?? '', 10) || 500;
-	const key = cacheKey($page.params.client, $page.params.name);
+	const parsedDebounce = Number.parseInt(env.PUBLIC_CACHE_DEBOUNCE_MS ?? '', 10);
+	const debounceMs = Number.isNaN(parsedDebounce) || parsedDebounce < 0 ? 500 : parsedDebounce;
 
 	let files: File[] = data.files;
 	let fromCache = false;
 	let saveTimer: ReturnType<typeof setTimeout> | undefined;
+	let mounted = false;
+	let loadedKey = '';
 
+	// SvelteKit reuses this component across same-route demo switches (bottomBar
+	// navigates via goto), updating only `data`. Recompute the cache key reactively
+	// so navigation reloads the right demo instead of keeping stale files.
+	$: key = cacheKey($page.params.client, $page.params.name);
+
+	function loadForKey(k: string) {
+		if (saveTimer) clearTimeout(saveTimer);
+		const cached = loadCache(k);
+		files = cached ?? data.files;
+		fromCache = cached !== null;
+		loadedKey = k;
+	}
+
+	// Read from localStorage only after mount (client-only, post-hydration) so the
+	// first client render matches SSR output and hydration stays clean.
 	onMount(() => {
-		const cached = loadCache(key);
-		if (cached !== null) {
-			files = cached;
-			fromCache = true;
-		}
+		mounted = true;
+		loadForKey(key);
+	});
+
+	$: if (mounted && key !== loadedKey) loadForKey(key);
+
+	onDestroy(() => {
+		if (saveTimer) clearTimeout(saveTimer);
 	});
 
 	function handleChange(edited: File[]) {
+		const savingKey = key;
 		if (saveTimer) clearTimeout(saveTimer);
-		saveTimer = setTimeout(() => {
-			saveCache(key, edited);
-			fromCache = true;
-		}, debounceMs);
+		saveTimer = setTimeout(() => saveCache(savingKey, edited), debounceMs);
 	}
 
 	function handleClear() {

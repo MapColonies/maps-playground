@@ -2,11 +2,6 @@ import type { File } from '$lib/types';
 
 const NAMESPACE = 'demo-cache:v1';
 
-interface CacheEntry {
-	files: File[];
-	savedAt: number;
-}
-
 function available(): boolean {
 	return typeof localStorage !== 'undefined';
 }
@@ -20,8 +15,8 @@ export function loadCache(key: string): File[] | null {
 	const raw = localStorage.getItem(key);
 	if (raw === null) return null;
 	try {
-		const entry = JSON.parse(raw) as CacheEntry;
-		return Array.isArray(entry.files) ? entry.files : null;
+		const files = JSON.parse(raw) as File[];
+		return Array.isArray(files) ? files : null;
 	} catch {
 		return null;
 	}
@@ -29,11 +24,18 @@ export function loadCache(key: string): File[] | null {
 
 export function saveCache(key: string, files: File[]): void {
 	if (!available()) return;
-	const entry: CacheEntry = { files, savedAt: Date.now() };
-	localStorage.setItem(key, JSON.stringify(entry));
+	try {
+		localStorage.setItem(key, JSON.stringify(files));
+	} catch {
+		// Ignore quota / private-mode write failures — caching is best-effort.
+	}
 }
 
 export function clearCache(key: string): void {
 	if (!available()) return;
-	localStorage.removeItem(key);
+	try {
+		localStorage.removeItem(key);
+	} catch {
+		// Ignore — clearing is best-effort.
+	}
 }
