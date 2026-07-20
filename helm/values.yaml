@@ -26,6 +26,9 @@ env:
   port: 8080
   targetPort: 8080
 
+cache:
+  debounceMs: 500
+
 resources:
   enabled: true
   value:

@@ -17,6 +17,7 @@ data:
   PUBLIC_CATALOG_HREF: 'http://catalog'
   PUBLIC_DEVPORTAL_HREF: 'http://developer-portal'
   PUBLIC_PUZZLE_HREF: ''
+  PUBLIC_CACHE_DEBOUNCE_MS: {{ .Values.cache.debounceMs | quote }}
   npm_config_cache: /tmp/
   # default.conf: {{ tpl (.Files.Get "config/default.conf") . | quote }}
 {{- end }}
