@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/MapColonies/maps-playground/compare/v1.1.0...v1.1.1) (2026-07-20)
+
+
+### Bug Fixes
+
+* **helm:** rename chart to maps-playground ([f3a6f9b](https://github.com/MapColonies/maps-playground/commit/f3a6f9bf731c800d56d9dd3b7a8adea794b223b1))
+* **helm:** rename chart to maps-playground ([#16](https://github.com/MapColonies/maps-playground/issues/16)) ([1efb356](https://github.com/MapColonies/maps-playground/commit/1efb356302234f7aee8218b8c18101aaeb3d30fc))
+
 ## [1.1.0](https://github.com/MapColonies/maps-playground/compare/v1.0.0...v1.1.0) (2026-07-19)
 
 
