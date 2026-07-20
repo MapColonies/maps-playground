@@ -3,6 +3,7 @@
 	import type { File, Link } from '$lib/types';
 	export let files: File[];
 	export let links: Link[];
+	export let onChange: ((files: File[]) => void) | undefined = undefined;
 
 	const flemsBaseConfig = {
 		shareButton: false,
@@ -13,6 +14,12 @@
 	};
 
 	let flemsInstance: any;
+
+	function wireOnChange() {
+		if (!flemsInstance || !onChange) return;
+		flemsInstance.onchange = (state: { files: File[] }) =>
+			onChange?.(state.files.map((f) => ({ name: f.name, content: f.content })));
+	}
 
 	$: if (flemsInstance) {
 		flemsInstance.set({
@@ -29,6 +36,7 @@
 			files,
 			links: links.map((link) => ({ ...link, url: window.location.origin + link.url }))
 		});
+		wireOnChange();
 	});
 </script>
 
