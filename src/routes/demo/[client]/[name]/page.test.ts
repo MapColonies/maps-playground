@@ -41,7 +41,20 @@ async function renderPage(opts: RenderOpts = {}) {
 
 	const Page = (await import('./+page.svelte')).default;
 	const result = render(Page, {
-		props: { data: { files: dataFiles, links: [], demoName: name, displayName: '', description: '' } }
+		props: {
+			// Full PageData shape: the page only reads files/links/demoName/displayName/
+			// description, but svelte-check enforces the load function's complete type.
+			data: {
+				clients: [{ name: client, defaultItem: name }],
+				items: [{ name }],
+				activeClient: client,
+				links: [],
+				files: dataFiles,
+				demoName: name,
+				displayName: '',
+				description: ''
+			}
+		}
 	});
 
 	const mockProps = flemsMockProps;
