@@ -17,9 +17,7 @@
 	let mounted = false;
 	let loadedKey = '';
 
-	// SvelteKit reuses this component across same-route demo switches (bottomBar
-	// navigates via goto), updating only `data`. Recompute the cache key reactively
-	// so navigation reloads the right demo instead of keeping stale files.
+	// Recompute the cache key reactively so navigation reloads the right demo instead of keeping stale files.
 	$: key = cacheKey($page.params.client, $page.params.name);
 
 	function loadForKey(k: string) {
