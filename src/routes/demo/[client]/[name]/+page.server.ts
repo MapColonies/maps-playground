@@ -1,4 +1,5 @@
 import { getDemoIndex, getFile } from '$lib/server/demoManager.js';
+import { demoViewsTotal } from '$lib/server/metrics';
 import type { Link, File } from '$lib/types';
 
 export async function load({ params }): Promise<{
@@ -9,6 +10,8 @@ export async function load({ params }): Promise<{
 	description?: string;
 }> {
 	const { client, name: demoName } = params;
+
+	demoViewsTotal.inc({ client, name: demoName });
 
 	const demoMetadata = (await getDemoIndex())[client][demoName];
 
