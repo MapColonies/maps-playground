@@ -28,4 +28,10 @@ describe('demo view counter', () => {
 		expect(await viewCount('openlayers', 'basic')).toBe(before + 1);
 		expect(demoViewsTotal).toBeDefined();
 	});
+
+	it('does not increment for an unknown demo', async () => {
+		const before = await viewCount('nope', 'missing');
+		await expect(load({ params: { client: 'nope', name: 'missing' } } as any)).rejects.toThrow();
+		expect(await viewCount('nope', 'missing')).toBe(before);
+	});
 });

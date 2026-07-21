@@ -1,3 +1,4 @@
+import { error } from '@sveltejs/kit';
 import { getDemoIndex, getFile } from '$lib/server/demoManager.js';
 import { demoViewsTotal } from '$lib/server/metrics';
 import type { Link, File } from '$lib/types';
@@ -11,9 +12,12 @@ export async function load({ params }): Promise<{
 }> {
 	const { client, name: demoName } = params;
 
-	demoViewsTotal.inc({ client, name: demoName });
+	const demoMetadata = (await getDemoIndex())[client]?.[demoName];
+	if (!demoMetadata) {
+		throw error(404, `no demo named ${demoName} found in client ${client}`);
+	}
 
-	const demoMetadata = (await getDemoIndex())[client][demoName];
+	demoViewsTotal.inc({ client, name: demoName });
 
 	const files = await Promise.all(
 		demoMetadata.files.map(async (fileName) => {
