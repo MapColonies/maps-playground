@@ -8,7 +8,13 @@ export default defineConfig({
 	plugins: [svelte({ preprocess: preprocess(), hot: false })],
 	resolve: {
 		alias: {
-			$lib: path.resolve('./src/lib')
+			$lib: path.resolve('./src/lib'),
+			// SvelteKit virtual modules have no resolver under the plain `svelte`
+			// vitest plugin (no `sveltekit()`), so Vite fails to transform any
+			// component importing them. Alias them to inert stubs; per-test
+			// `vi.doMock` overrides these at runtime with the real behaviour.
+			'$app/stores': path.resolve('./src/test/virtual/app-stores.ts'),
+			'$env/dynamic/public': path.resolve('./src/test/virtual/env-dynamic-public.ts')
 		},
 		// Resolve Svelte's browser build under jsdom. In @testing-library/svelte v5
 		// this is handled by the svelteTesting() vite plugin, which does not exist
