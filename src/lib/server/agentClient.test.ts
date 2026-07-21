@@ -161,7 +161,10 @@ describe('runAgent', () => {
 							{
 								id: 'x',
 								type: 'function',
-								function: { name: 'write_file', arguments: JSON.stringify({ name: 'a.js', content: 'z' }) }
+								function: {
+									name: 'write_file',
+									arguments: JSON.stringify({ name: 'a.js', content: 'z' })
+								}
 							}
 						]
 					}
@@ -179,7 +182,7 @@ describe('runAgent', () => {
 	});
 
 	it('throws on a non-ok response', async () => {
-		const fn = vi.fn(async () => ({ ok: false, status: 500 }) as Response);
+		const fn = vi.fn(async () => ({ ok: false, status: 500 } as Response));
 		await expect(
 			runAgent({ files: [], messages: [{ role: 'user', content: 'x' }], config: cfg(fn) })
 		).rejects.toThrow(/500/);
@@ -188,16 +191,21 @@ describe('runAgent', () => {
 
 describe('fetchModels', () => {
 	it('maps the OpenAI models payload to id strings', async () => {
-		const fn = vi.fn(async () => ({
-			ok: true,
-			json: async () => ({ data: [{ id: 'gpt-4o' }, { id: 'claude-sonnet' }] })
-		}) as Response);
+		const fn = vi.fn(
+			async () =>
+				({
+					ok: true,
+					json: async () => ({ data: [{ id: 'gpt-4o' }, { id: 'claude-sonnet' }] })
+				} as Response)
+		);
 		const ids = await fetchModels({ baseUrl: 'http://p', apiKey: 'k', fetchFn: fn });
 		expect(ids).toEqual(['gpt-4o', 'claude-sonnet']);
 	});
 
 	it('throws on a non-ok response', async () => {
-		const fn = vi.fn(async () => ({ ok: false, status: 401 }) as Response);
-		await expect(fetchModels({ baseUrl: 'http://p', apiKey: 'k', fetchFn: fn })).rejects.toThrow(/401/);
+		const fn = vi.fn(async () => ({ ok: false, status: 401 } as Response));
+		await expect(fetchModels({ baseUrl: 'http://p', apiKey: 'k', fetchFn: fn })).rejects.toThrow(
+			/401/
+		);
 	});
 });

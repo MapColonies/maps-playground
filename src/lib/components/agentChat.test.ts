@@ -8,7 +8,10 @@ const files: File[] = [{ name: 'index.js', content: 'const zoom = 4;' }];
 function mockFetch(agentResponse: unknown) {
 	return vi.fn(async (url: string) => {
 		if (String(url).endsWith('/api/agent/models')) {
-			return { ok: true, json: async () => ({ models: ['gpt-4o'], default: 'gpt-4o' }) } as Response;
+			return {
+				ok: true,
+				json: async () => ({ models: ['gpt-4o'], default: 'gpt-4o' })
+			} as Response;
 		}
 		return { ok: true, json: async () => agentResponse } as Response;
 	});

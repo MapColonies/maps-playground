@@ -38,7 +38,13 @@
 			const res = await fetch('/api/agent', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({ files, messages: outgoing, model: selectedModel, demoName, description })
+				body: JSON.stringify({
+					files,
+					messages: outgoing,
+					model: selectedModel,
+					demoName,
+					description
+				})
 			});
 			if (!res.ok) throw new Error(`request failed (${res.status})`);
 			const data = (await res.json()) as { reply: string; files: File[] };

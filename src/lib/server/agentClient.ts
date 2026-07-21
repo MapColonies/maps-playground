@@ -25,7 +25,8 @@ export function applyTool(
 		if (!file) return { files, result: `error: file ${fname} not found` };
 		const count = oldStr === '' ? 0 : file.content.split(oldStr).length - 1;
 		if (count === 0) return { files, result: `error: old_string not found in ${fname}` };
-		if (count > 1) return { files, result: `error: old_string not unique in ${fname} (${count} matches)` };
+		if (count > 1)
+			return { files, result: `error: old_string not unique in ${fname} (${count} matches)` };
 		const next = files.map((f) =>
 			f.name === fname ? { name: f.name, content: f.content.replace(oldStr, newStr) } : f
 		);
