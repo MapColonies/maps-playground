@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.2.0](https://github.com/MapColonies/maps-playground/compare/v1.1.1...v1.2.0) (2026-07-21)
+
+
+### Features
+
+* add demoCache localStorage util ([5823219](https://github.com/MapColonies/maps-playground/commit/5823219de9fcde5af2ad188eae716f0c5732cfe1))
+* cache demo edits in localStorage with Loaded-from-cache banner ([#18](https://github.com/MapColonies/maps-playground/issues/18)) ([f7685da](https://github.com/MapColonies/maps-playground/commit/f7685da42d979bf847a9ba272d366e55509342e3))
+* cache demo edits with Loaded-from-cache banner and clear button ([d627e9d](https://github.com/MapColonies/maps-playground/commit/d627e9d4e5258b087752a678ee53607e7477e3c1))
+* emit edited files from flems component via onChange ([1bd4344](https://github.com/MapColonies/maps-playground/commit/1bd434481325143498fabeb229d840ccc62ee96a))
+* **helm:** expose cache.debounceMs as PUBLIC_CACHE_DEBOUNCE_MS ([00b550c](https://github.com/MapColonies/maps-playground/commit/00b550cd09061978bbbb4b88fcad3de5ccd9c2c7))
+
+
+### Bug Fixes
+
+* register Flems onchange, react to demo switches, harden cache ([b4e9443](https://github.com/MapColonies/maps-playground/commit/b4e944369de9e2ef4fd0457a0d52a18f0a9004cb))
+
 ## [1.1.1](https://github.com/MapColonies/maps-playground/compare/v1.1.0...v1.1.1) (2026-07-20)
 
 
