@@ -27,6 +27,12 @@ mclabels:
     path: /metrics
   logScraping: false
 
+metrics:
+  grafanaDashboard:
+    enabled: true
+    label: grafana_dashboard
+    value: "1"
+
 s3:
   url: 'http://localhost:9000'
   bucket: 'temp'
