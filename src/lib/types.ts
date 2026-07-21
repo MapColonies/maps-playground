@@ -20,3 +20,8 @@ export interface DemoMetadata {
 export type ClientMetadata = Record<string, DemoMetadata>;
 
 export type DemoIndex = Record<string, ClientMetadata>;
+
+export interface ChatMessage {
+	role: 'user' | 'assistant';
+	content: string;
+}
