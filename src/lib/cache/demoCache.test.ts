@@ -68,8 +68,7 @@ describe('SSR guard', () => {
 		expect(loadCache('k')).toBeNull();
 		expect(() => saveCache('k', files)).not.toThrow();
 		expect(() => clearCache('k')).not.toThrow();
-		// Restore before the shared afterEach (vitest-setup.ts) calls
-		// localStorage.clear() ahead of vi.unstubAllGlobals().
-		vi.unstubAllGlobals();
+		// No manual restore needed: the shared afterEach (vitest-setup.ts)
+		// unstubs globals before clearing localStorage.
 	});
 });
