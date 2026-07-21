@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { env } from '$env/dynamic/public';
 	import Flems from '$lib/components/flems.svelte';
+	import AgentChat from '$lib/components/agentChat.svelte';
 	import type { File } from '$lib/types';
 	import { cacheKey, loadCache, saveCache, clearCache } from '$lib/cache/demoCache';
 
@@ -47,6 +48,13 @@
 		saveTimer = setTimeout(() => saveCache(savingKey, edited), debounceMs);
 	}
 
+	function handleAgentFiles(next: File[]) {
+		files = next;
+		fromCache = true;
+		if (saveTimer) clearTimeout(saveTimer);
+		saveCache(key, next);
+	}
+
 	function handleClear() {
 		if (!window.confirm('Discard your edits and reload the original example?')) return;
 		if (saveTimer) clearTimeout(saveTimer);
@@ -75,6 +83,16 @@
 	{/if}
 
 	<div class="flex-1 min-h-0 flex flex-row gap-3 p-3 bg-gray-50 dark:bg-gray-900">
+		<aside
+			class="w-96 shrink-0 flex flex-col rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800"
+		>
+			<AgentChat
+				{files}
+				onFilesChange={handleAgentFiles}
+				demoName={data.displayName || data.demoName}
+				description={data.description}
+			/>
+		</aside>
 		<div
 			class="flex-1 min-w-0 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800"
 		>
