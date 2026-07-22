@@ -9,3 +9,7 @@ node_modules
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 examples/assets/
+
+helm/charts/*.tgz
+helm/values-*.yaml
+docs/
