@@ -59,4 +59,37 @@ describe('agentChat.svelte', () => {
 		await fireEvent.click(getByText('Send'));
 		expect(await findByText(/request failed/i)).toBeInTheDocument();
 	});
+
+	it('sends only {name, content} even if the files prop carries extra/circular state', async () => {
+		const captured: unknown[] = [];
+		const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+			if (String(url).endsWith('/api/agent/models')) {
+				return {
+					ok: true,
+					json: async () => ({ models: ['gpt-4o'], default: 'gpt-4o' })
+				} as Response;
+			}
+			captured.push(JSON.parse(String(init?.body)));
+			return { ok: true, json: async () => ({ reply: 'ok', files: [] }) } as Response;
+		});
+		vi.stubGlobal('fetch', fetchMock);
+
+		// Prop object polluted the way Flems/CodeMirror would (circular editor state).
+		const polluted = { name: 'index.js', content: 'x' } as File & { doc?: unknown };
+		const doc: { self?: unknown } = {};
+		doc.self = doc;
+		polluted.doc = doc;
+
+		const { getByPlaceholderText, getByText } = render(AgentChat, {
+			props: { files: [polluted], onFilesChange: vi.fn(), demoName: 'demo', description: 'd' }
+		});
+		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
+		await fireEvent.input(getByPlaceholderText('Ask the agent to edit this demo…'), {
+			target: { value: 'go' }
+		});
+		await fireEvent.click(getByText('Send'));
+
+		await waitFor(() => expect(captured).toHaveLength(1));
+		expect((captured[0] as { files: unknown }).files).toEqual([{ name: 'index.js', content: 'x' }]);
+	});
 });
