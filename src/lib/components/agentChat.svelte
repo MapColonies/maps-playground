@@ -6,8 +6,16 @@
 	export let onFilesChange: (files: File[]) => void;
 	export let demoName: string | undefined = undefined;
 	export let description: string | undefined = undefined;
+	export let messages: ChatMessage[] = [];
+	export let onMessagesChange: (messages: ChatMessage[]) => void = () => {};
 
-	let messages: ChatMessage[] = [];
+	// Update local state for immediate render AND notify the parent so it can
+	// persist per-example chat history.
+	function setMessages(next: ChatMessage[]) {
+		messages = next;
+		onMessagesChange(next);
+	}
+
 	let input = '';
 	let busy = false;
 	let error = '';
@@ -31,7 +39,7 @@
 		if (!text || busy) return;
 		error = '';
 		const outgoing: ChatMessage[] = [...messages, { role: 'user', content: text }];
-		messages = outgoing;
+		setMessages(outgoing);
 		input = '';
 		busy = true;
 		try {
@@ -50,7 +58,7 @@
 			const data = (await res.json()) as { reply: string; files: File[] };
 			const filesChanged = JSON.stringify(data.files) !== JSON.stringify(files);
 			const reply = data.reply?.trim() || (filesChanged ? '(updated the files)' : '(no response)');
-			messages = [...outgoing, { role: 'assistant', content: reply }];
+			setMessages([...outgoing, { role: 'assistant', content: reply }]);
 			if (filesChanged) {
 				onFilesChange(data.files);
 			}

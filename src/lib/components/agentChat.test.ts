@@ -36,6 +36,33 @@ describe('agentChat.svelte', () => {
 		await waitFor(() => expect(onFilesChange).toHaveBeenCalledWith(changed));
 	});
 
+	it('renders restored history and fires onMessagesChange for user + assistant turns', async () => {
+		vi.stubGlobal('fetch', mockFetch({ reply: 'added it', files }));
+		const onMessagesChange = vi.fn();
+		const restored = [{ role: 'user' as const, content: 'earlier question' }];
+		const { getByPlaceholderText, getByText, findByText } = render(AgentChat, {
+			props: { files, onFilesChange: vi.fn(), messages: restored, onMessagesChange }
+		});
+
+		// Restored thread is shown on mount.
+		await findByText('earlier question');
+		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
+
+		await fireEvent.input(getByPlaceholderText('Ask the agent to edit this demo…'), {
+			target: { value: 'now this' }
+		});
+		await fireEvent.click(getByText('Send'));
+
+		// Optimistic user append, then the assistant reply — both persisted via the callback.
+		await waitFor(() =>
+			expect(onMessagesChange).toHaveBeenLastCalledWith([
+				{ role: 'user', content: 'earlier question' },
+				{ role: 'user', content: 'now this' },
+				{ role: 'assistant', content: 'added it' }
+			])
+		);
+	});
+
 	it('shows an error banner when the request fails', async () => {
 		vi.stubGlobal(
 			'fetch',

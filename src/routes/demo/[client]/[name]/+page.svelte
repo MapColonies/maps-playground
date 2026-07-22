@@ -5,7 +5,17 @@
 	import Flems from '$lib/components/flems.svelte';
 	import AgentChat from '$lib/components/agentChat.svelte';
 	import type { File } from '$lib/types';
-	import { cacheKey, loadCache, saveCache, clearCache } from '$lib/cache/demoCache';
+	import {
+		cacheKey,
+		loadCache,
+		saveCache,
+		clearCache,
+		chatKey,
+		loadChat,
+		saveChat,
+		clearChat
+	} from '$lib/cache/demoCache';
+	import type { ChatMessage } from '$lib/types';
 
 	export let data;
 
@@ -13,19 +23,23 @@
 	const debounceMs = Number.isNaN(parsedDebounce) || parsedDebounce < 0 ? 500 : parsedDebounce;
 
 	let files: File[] = data.files;
+	let chat: ChatMessage[] = [];
 	let fromCache = false;
 	let saveTimer: ReturnType<typeof setTimeout> | undefined;
 	let mounted = false;
 	let loadedKey = '';
 
-	// Recompute the cache key reactively so navigation reloads the right demo instead of keeping stale files.
+	// Recompute the cache keys reactively so navigation reloads the right demo instead of keeping stale files/chat.
 	$: key = cacheKey($page.params.client, $page.params.name);
+	$: chatK = chatKey($page.params.client, $page.params.name);
 
 	function loadForKey(k: string) {
 		if (saveTimer) clearTimeout(saveTimer);
 		const cached = loadCache(k);
 		files = cached ?? data.files;
 		fromCache = cached !== null;
+		// Chat history is per-example; restore this example's thread (or start empty).
+		chat = loadChat(chatKey($page.params.client, $page.params.name)) ?? [];
 		loadedKey = k;
 	}
 
@@ -55,11 +69,19 @@
 		saveCache(key, next);
 	}
 
+	// Persist chat immediately — messages are discrete events, not rapid keystrokes.
+	function handleChatChange(next: ChatMessage[]) {
+		chat = next;
+		saveChat(chatK, next);
+	}
+
 	function handleClear() {
 		if (!window.confirm('Discard your edits and reload the original example?')) return;
 		if (saveTimer) clearTimeout(saveTimer);
 		clearCache(key);
+		clearChat(chatK);
 		files = data.files;
+		chat = [];
 		fromCache = false;
 	}
 </script>
@@ -90,6 +112,8 @@
 				<AgentChat
 					{files}
 					onFilesChange={handleAgentFiles}
+					messages={chat}
+					onMessagesChange={handleChatChange}
 					demoName={data.displayName || data.demoName}
 					description={data.description}
 				/>
