@@ -16,6 +16,23 @@ image:
   tag: 0.0.1-4
   imagePullPolicy: IfNotPresent
 
+mclabels:
+  environment: production
+  owner: common
+  partOf: maps-playground
+  component: frontend
+  prometheus:
+    enabled: true
+    port: 8080
+    path: /metrics
+  logScraping: false
+
+metrics:
+  grafanaDashboard:
+    enabled: true
+    label: grafana_dashboard
+    value: "1"
+
 s3:
   url: 'http://localhost:9000'
   bucket: 'temp'
