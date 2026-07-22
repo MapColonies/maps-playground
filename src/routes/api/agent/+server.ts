@@ -1,8 +1,10 @@
 import { json, error } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import { runAgent } from '$lib/server/agentClient';
+import { assertAgentAccess } from '$lib/server/agentGuard';
 
-export async function POST({ request }) {
+export async function POST({ request, url }) {
+	assertAgentAccess(request, url);
 	const { LITELLM_BASE_URL, LITELLM_API_KEY, AGENT_MODEL } = env;
 	if (!LITELLM_BASE_URL || !LITELLM_API_KEY) {
 		throw error(500, 'agent not configured');
@@ -28,6 +30,7 @@ export async function POST({ request }) {
 		});
 		return json(result);
 	} catch (e) {
-		throw error(502, `agent failed: ${(e as Error).message}`);
+		console.error('agent request failed:', e);
+		throw error(502, 'agent request failed');
 	}
 }

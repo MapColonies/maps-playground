@@ -120,6 +120,8 @@ export async function runAgent(opts: {
 	];
 
 	for (let i = 0; i < maxIterations; i++) {
+		// Rebuild the system prompt so its file list reflects edits applied so far.
+		convo[0] = { role: 'system', content: systemPrompt(files, opts.demoName, opts.description) };
 		const res = await doFetch(`${config.baseUrl}/v1/chat/completions`, {
 			method: 'POST',
 			headers: { 'content-type': 'application/json', authorization: `Bearer ${config.apiKey}` },
@@ -151,7 +153,8 @@ export async function runAgent(opts: {
 
 	const lastText =
 		[...convo].reverse().find((m) => m.role === 'assistant' && m.content)?.content ?? '';
-	return { reply: lastText || 'Reached the tool iteration limit.', files };
+	const capNote = `Stopped after the ${maxIterations}-step tool limit; changes so far are applied.`;
+	return { reply: lastText ? `${capNote}\n\n${lastText}` : capNote, files };
 }
 
 export async function fetchModels(config: {

@@ -178,7 +178,8 @@ describe('runAgent', () => {
 			config: { ...cfg(fn), maxIterations: 2 }
 		});
 		expect(fn).toHaveBeenCalledTimes(2);
-		expect(out.reply).toBe('still going');
+		expect(out.reply).toMatch(/tool limit/i);
+		expect(out.reply).toMatch(/still going/);
 	});
 
 	it('throws on a non-ok response', async () => {

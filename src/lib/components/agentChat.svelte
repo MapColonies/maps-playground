@@ -48,8 +48,10 @@
 			});
 			if (!res.ok) throw new Error(`request failed (${res.status})`);
 			const data = (await res.json()) as { reply: string; files: File[] };
-			messages = [...outgoing, { role: 'assistant', content: data.reply }];
-			if (JSON.stringify(data.files) !== JSON.stringify(files)) {
+			const filesChanged = JSON.stringify(data.files) !== JSON.stringify(files);
+			const reply = data.reply?.trim() || (filesChanged ? '(updated the files)' : '(no response)');
+			messages = [...outgoing, { role: 'assistant', content: reply }];
+			if (filesChanged) {
 				onFilesChange(data.files);
 			}
 		} catch (e) {

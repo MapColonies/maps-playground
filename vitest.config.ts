@@ -10,7 +10,8 @@ export default defineConfig({
 		alias: {
 			$lib: path.resolve('./src/lib'),
 			'$app/stores': path.resolve('./src/test/virtual/app-stores.ts'),
-			'$env/dynamic/public': path.resolve('./src/test/virtual/env-dynamic-public.ts')
+			'$env/dynamic/public': path.resolve('./src/test/virtual/env-dynamic-public.ts'),
+			'$env/dynamic/private': path.resolve('./src/test/virtual/env-dynamic-private.ts')
 		},
 		conditions: ['browser']
 	},

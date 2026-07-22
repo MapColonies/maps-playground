@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 import { getDemoIndex, getFile } from '$lib/server/demoManager.js';
 import { demoViewsTotal } from '$lib/server/metrics';
 import type { Link, File } from '$lib/types';
@@ -9,6 +10,7 @@ export async function load({ params }): Promise<{
 	demoName: string;
 	displayName?: string;
 	description?: string;
+	agentEnabled: boolean;
 }> {
 	const { client, name: demoName } = params;
 
@@ -31,6 +33,7 @@ export async function load({ params }): Promise<{
 		files,
 		demoName,
 		displayName: demoMetadata.displayName,
-		description: demoMetadata.description
+		description: demoMetadata.description,
+		agentEnabled: env.AGENT_ENABLED === 'true'
 	};
 }

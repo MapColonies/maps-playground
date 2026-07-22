@@ -52,7 +52,8 @@ async function renderPage(opts: RenderOpts = {}) {
 				files: dataFiles,
 				demoName: name,
 				displayName: '',
-				description: ''
+				description: '',
+				agentEnabled: false
 			}
 		}
 	});
