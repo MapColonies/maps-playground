@@ -5,7 +5,7 @@
 </script>
 
 <div class="h-full flex flex-col">
-	<div class="flex-grow">
+	<div class="flex-grow min-h-0">
 		<slot />
 	</div>
 	<BottomBar

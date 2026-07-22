@@ -39,7 +39,7 @@
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
-					files,
+					files: files.map((f) => ({ name: f.name, content: f.content })),
 					messages: outgoing,
 					model: selectedModel,
 					demoName,
@@ -82,7 +82,7 @@
 		</select>
 	</header>
 
-	<div class="flex-1 space-y-3 overflow-y-auto px-4 py-3">
+	<div class="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
 		{#each messages as m}
 			<div
 				class="text-sm {m.role === 'user'
