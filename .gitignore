@@ -10,11 +10,6 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 examples/assets/
 
-# Helm dependency build artifacts — regenerated from Chart.lock via `helm dependency build`
 helm/charts/*.tgz
-
-# Environment-specific Helm values (not part of the generic chart)
 helm/values-*.yaml
-
-# Design docs / plans — kept on disk, never committed
 docs/
