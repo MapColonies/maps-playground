@@ -3,11 +3,17 @@
 	import type { File, ChatMessage } from '$lib/types';
 
 	export let files: File[];
-	export let onFilesChange: (files: File[]) => void;
+	// Cache keys identifying the example this panel is currently showing. Every
+	// async op captures them at start so a late response is committed to the
+	// example it was asked about, even after the user navigates elsewhere.
+	export let chatCacheKey = '';
+	export let fileCacheKey = '';
+	export let onFilesChange: (files: File[], originKey: string) => void = () => undefined;
 	export let demoName: string | undefined = undefined;
 	export let description: string | undefined = undefined;
 	export let messages: ChatMessage[] = [];
-	export let onMessagesChange: (messages: ChatMessage[]) => void = () => undefined;
+	export let onMessagesChange: (messages: ChatMessage[], originKey: string) => void = () =>
+		undefined;
 
 	// Slash commands handled entirely client-side — they never reach the model.
 	const COMMANDS = [
@@ -15,11 +21,11 @@
 		{ name: '/compress', desc: 'Summarize the conversation to save context' }
 	];
 
-	// Update local state for immediate render AND notify the parent so it can
-	// persist per-example chat history.
-	function setMessages(next: ChatMessage[]) {
-		messages = next;
-		onMessagesChange(next);
+	// Reflect a message list: notify the parent so it persists to originKey, and
+	// update the visible thread only if the user is still viewing that example.
+	function commitMessages(next: ChatMessage[], originKey: string) {
+		if (originKey === chatCacheKey) messages = next;
+		onMessagesChange(next, originKey);
 	}
 
 	let input = '';
@@ -55,7 +61,8 @@
 		hideSuggestions = true;
 		if (name === '/clear') {
 			error = '';
-			setMessages([]);
+			// Persist the emptied thread for this example (overrides its cache).
+			commitMessages([], chatCacheKey);
 		} else if (name === '/compress') {
 			compress();
 		}
@@ -73,24 +80,27 @@
 			error = 'Nothing to compress yet.';
 			return;
 		}
+		const originKey = chatCacheKey;
+		const history = messages;
 		error = '';
 		busy = true;
 		try {
 			const res = await fetch('/api/agent/compress', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({ messages, model: selectedModel })
+				body: JSON.stringify({ messages: history, model: selectedModel })
 			});
 			if (!res.ok) throw new Error(`request failed (${res.status})`);
 			const data = (await res.json()) as { summary: string };
 			const summary = (data.summary ?? '').trim();
 			if (summary) {
-				setMessages([
-					{ role: 'assistant', content: `Summary of earlier conversation:\n${summary}` }
-				]);
+				commitMessages(
+					[{ role: 'assistant', content: `Summary of earlier conversation:\n${summary}` }],
+					originKey
+				);
 			}
 		} catch (e) {
-			error = `compress failed: ${(e as Error).message}`;
+			if (originKey === chatCacheKey) error = `compress failed: ${(e as Error).message}`;
 		} finally {
 			busy = false;
 		}
@@ -104,9 +114,13 @@
 			runCommand(text.toLowerCase());
 			return;
 		}
+		// Bind this request to the example it was issued from.
+		const originChat = chatCacheKey;
+		const originFile = fileCacheKey;
+		const originFiles = files;
 		error = '';
 		const outgoing: ChatMessage[] = [...messages, { role: 'user', content: text }];
-		setMessages(outgoing);
+		commitMessages(outgoing, originChat);
 		clearInputState();
 		busy = true;
 		try {
@@ -114,7 +128,7 @@
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
-					files: files.map((f) => ({ name: f.name, content: f.content })),
+					files: originFiles.map((f) => ({ name: f.name, content: f.content })),
 					messages: outgoing,
 					model: selectedModel,
 					demoName,
@@ -123,14 +137,14 @@
 			});
 			if (!res.ok) throw new Error(`request failed (${res.status})`);
 			const data = (await res.json()) as { reply: string; files: File[] };
-			const filesChanged = JSON.stringify(data.files) !== JSON.stringify(files);
+			const filesChanged = JSON.stringify(data.files) !== JSON.stringify(originFiles);
 			const reply = data.reply?.trim() || (filesChanged ? '(updated the files)' : '(no response)');
-			setMessages([...outgoing, { role: 'assistant', content: reply }]);
+			commitMessages([...outgoing, { role: 'assistant', content: reply }], originChat);
 			if (filesChanged) {
-				onFilesChange(data.files);
+				onFilesChange(data.files, originFile);
 			}
 		} catch (e) {
-			error = `request failed: ${(e as Error).message}`;
+			if (originChat === chatCacheKey) error = `request failed: ${(e as Error).message}`;
 		} finally {
 			busy = false;
 		}
@@ -170,12 +184,19 @@
 	<header class="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
 		<div class="flex items-center justify-between">
 			<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Agent</h2>
-			<div class="relative">
+			<!-- Info shows on hover (and keyboard focus for a11y), not on click. -->
+			<div
+				class="relative"
+				role="note"
+				on:mouseenter={() => (showInfo = true)}
+				on:mouseleave={() => (showInfo = false)}
+				on:focusin={() => (showInfo = true)}
+				on:focusout={() => (showInfo = false)}
+			>
 				<button
 					type="button"
 					aria-label="About chat commands"
 					title="About chat commands"
-					on:click={() => (showInfo = !showInfo)}
 					class="flex h-6 w-6 items-center justify-center rounded-full border border-gray-300 text-xs font-semibold text-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
 				>
 					i

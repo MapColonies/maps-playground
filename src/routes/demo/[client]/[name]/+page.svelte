@@ -62,17 +62,22 @@
 		saveTimer = setTimeout(() => saveCache(savingKey, edited), debounceMs);
 	}
 
-	function handleAgentFiles(next: File[]) {
-		files = next;
-		fromCache = true;
+	// Agent edits are bound to the example they were issued from (originKey), so a
+	// late response persists to that example even after the user navigated away.
+	function handleAgentFiles(next: File[], originKey: string) {
 		if (saveTimer) clearTimeout(saveTimer);
-		saveCache(key, next);
+		saveCache(originKey, next);
+		if (originKey === key) {
+			files = next;
+			fromCache = true;
+		}
 	}
 
 	// Persist chat immediately — messages are discrete events, not rapid keystrokes.
-	function handleChatChange(next: ChatMessage[]) {
-		chat = next;
-		saveChat(chatK, next);
+	// Persist to the originating example; only reflect it if still viewing that one.
+	function handleChatChange(next: ChatMessage[], originKey: string) {
+		saveChat(originKey, next);
+		if (originKey === chatK) chat = next;
 	}
 
 	function handleClear() {
@@ -111,6 +116,8 @@
 			>
 				<AgentChat
 					{files}
+					chatCacheKey={chatK}
+					fileCacheKey={key}
 					onFilesChange={handleAgentFiles}
 					messages={chat}
 					onMessagesChange={handleChatChange}

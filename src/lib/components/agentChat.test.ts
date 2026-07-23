@@ -23,7 +23,7 @@ describe('agentChat.svelte', () => {
 		vi.stubGlobal('fetch', mockFetch({ reply: 'done', files: changed }));
 		const onFilesChange = vi.fn();
 		const { getByPlaceholderText, getByText } = render(AgentChat, {
-			props: { files, onFilesChange, demoName: 'demo', description: 'd' }
+			props: { files, onFilesChange, fileCacheKey: 'file:A', demoName: 'demo', description: 'd' }
 		});
 
 		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
@@ -33,7 +33,7 @@ describe('agentChat.svelte', () => {
 		});
 		await fireEvent.click(getByText('Send'));
 
-		await waitFor(() => expect(onFilesChange).toHaveBeenCalledWith(changed));
+		await waitFor(() => expect(onFilesChange).toHaveBeenCalledWith(changed, 'file:A'));
 	});
 
 	it('renders restored history and fires onMessagesChange for user + assistant turns', async () => {
@@ -41,7 +41,13 @@ describe('agentChat.svelte', () => {
 		const onMessagesChange = vi.fn();
 		const restored = [{ role: 'user' as const, content: 'earlier question' }];
 		const { getByPlaceholderText, getByText, findByText } = render(AgentChat, {
-			props: { files, onFilesChange: vi.fn(), messages: restored, onMessagesChange }
+			props: {
+				files,
+				onFilesChange: vi.fn(),
+				messages: restored,
+				onMessagesChange,
+				chatCacheKey: 'chat:A'
+			}
 		});
 
 		// Restored thread is shown on mount.
@@ -53,13 +59,62 @@ describe('agentChat.svelte', () => {
 		});
 		await fireEvent.click(getByText('Send'));
 
-		// Optimistic user append, then the assistant reply — both persisted via the callback.
+		// Optimistic user append, then the assistant reply — both persisted with the origin key.
 		await waitFor(() =>
-			expect(onMessagesChange).toHaveBeenLastCalledWith([
-				{ role: 'user', content: 'earlier question' },
-				{ role: 'user', content: 'now this' },
-				{ role: 'assistant', content: 'added it' }
-			])
+			expect(onMessagesChange).toHaveBeenLastCalledWith(
+				[
+					{ role: 'user', content: 'earlier question' },
+					{ role: 'user', content: 'now this' },
+					{ role: 'assistant', content: 'added it' }
+				],
+				'chat:A'
+			)
+		);
+	});
+
+	it('commits a late response to the example it was asked from, not the current one', async () => {
+		let releaseAgent: () => void = () => undefined;
+		const gate = new Promise<void>((res) => (releaseAgent = res));
+		const fetchMock = vi.fn(async (url: string) => {
+			if (String(url).endsWith('/api/agent/models')) {
+				return {
+					ok: true,
+					json: async () => ({ models: ['gpt-4o'], default: 'gpt-4o' })
+				} as Response;
+			}
+			await gate; // hold the agent response open until we've navigated away
+			return { ok: true, json: async () => ({ reply: 'late reply', files }) } as Response;
+		});
+		vi.stubGlobal('fetch', fetchMock);
+		const onMessagesChange = vi.fn();
+		const { getByPlaceholderText, getByText, component } = render(AgentChat, {
+			props: {
+				files,
+				onFilesChange: vi.fn(),
+				messages: [],
+				onMessagesChange,
+				chatCacheKey: 'chat:A'
+			}
+		});
+		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
+
+		await fireEvent.input(getByPlaceholderText('Ask the agent to edit this demo…'), {
+			target: { value: 'question on A' }
+		});
+		await fireEvent.click(getByText('Send'));
+
+		// Simulate navigating to example B while the request is still in flight.
+		component.$set({ chatCacheKey: 'chat:B', messages: [] });
+
+		releaseAgent();
+		await waitFor(() =>
+			expect(onMessagesChange).toHaveBeenLastCalledWith(
+				[
+					{ role: 'user', content: 'question on A' },
+					{ role: 'assistant', content: 'late reply' }
+				],
+				'chat:A'
+			)
 		);
 	});
 
@@ -133,7 +188,7 @@ describe('agentChat.svelte', () => {
 		expect(getByText('/compress')).toBeInTheDocument();
 	});
 
-	it('/clear wipes the conversation without calling the model', async () => {
+	it('/clear wipes the conversation for its example without calling the model', async () => {
 		const fetchMock = mockFetch({ reply: 'should not happen', files });
 		vi.stubGlobal('fetch', fetchMock);
 		const onMessagesChange = vi.fn();
@@ -142,7 +197,8 @@ describe('agentChat.svelte', () => {
 				files,
 				onFilesChange: vi.fn(),
 				messages: [{ role: 'user', content: 'hi' }],
-				onMessagesChange
+				onMessagesChange,
+				chatCacheKey: 'chat:A'
 			}
 		});
 		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
@@ -150,12 +206,12 @@ describe('agentChat.svelte', () => {
 			target: { value: '/clear' }
 		});
 		await fireEvent.click(getByText('Send'));
-		await waitFor(() => expect(onMessagesChange).toHaveBeenLastCalledWith([]));
+		await waitFor(() => expect(onMessagesChange).toHaveBeenLastCalledWith([], 'chat:A'));
 		// only the models fetch happened — never /api/agent
 		expect(fetchMock.mock.calls.every((c) => !String(c[0]).endsWith('/api/agent'))).toBe(true);
 	});
 
-	it('/compress summarizes and replaces history via the compress endpoint', async () => {
+	it('/compress summarizes and replaces history for its example', async () => {
 		const fetchMock = vi.fn(async (url: string) => {
 			if (String(url).endsWith('/api/agent/models')) {
 				return {
@@ -178,7 +234,8 @@ describe('agentChat.svelte', () => {
 					{ role: 'user', content: 'set zoom to 8' },
 					{ role: 'assistant', content: 'done' }
 				],
-				onMessagesChange
+				onMessagesChange,
+				chatCacheKey: 'chat:A'
 			}
 		});
 		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
@@ -187,23 +244,32 @@ describe('agentChat.svelte', () => {
 		});
 		await fireEvent.click(getByText('Send'));
 		await waitFor(() =>
-			expect(onMessagesChange).toHaveBeenLastCalledWith([
-				{ role: 'assistant', content: 'Summary of earlier conversation:\nuser changed zoom to 8.' }
-			])
+			expect(onMessagesChange).toHaveBeenLastCalledWith(
+				[
+					{
+						role: 'assistant',
+						content: 'Summary of earlier conversation:\nuser changed zoom to 8.'
+					}
+				],
+				'chat:A'
+			)
 		);
 		expect(fetchMock.mock.calls.some((c) => String(c[0]).endsWith('/api/agent/compress'))).toBe(
 			true
 		);
 	});
 
-	it('the header info button toggles a command summary', async () => {
+	it('the header info summary appears on hover', async () => {
 		vi.stubGlobal('fetch', mockFetch({ reply: 'x', files }));
 		const { getByText, getByLabelText, queryByText, findByText } = render(AgentChat, {
 			props: { files, onFilesChange: vi.fn(), demoName: 'demo', description: 'd' }
 		});
 		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
 		expect(queryByText('Chat commands')).toBeNull();
-		await fireEvent.click(getByLabelText('About chat commands'));
+		const wrapper = getByLabelText('About chat commands').parentElement as HTMLElement;
+		await fireEvent.mouseEnter(wrapper);
 		expect(await findByText('Chat commands')).toBeInTheDocument();
+		await fireEvent.mouseLeave(wrapper);
+		await waitFor(() => expect(queryByText('Chat commands')).toBeNull());
 	});
 });
