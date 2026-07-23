@@ -183,7 +183,9 @@ describe('runAgent', () => {
 	});
 
 	it('throws on a non-ok response', async () => {
-		const fn = vi.fn(async () => ({ ok: false, status: 500 } as Response));
+		const fn = vi.fn(
+			async () => ({ ok: false, status: 500, text: async () => 'server boom' } as unknown as Response)
+		);
 		await expect(
 			runAgent({ files: [], messages: [{ role: 'user', content: 'x' }], config: cfg(fn) })
 		).rejects.toThrow(/500/);

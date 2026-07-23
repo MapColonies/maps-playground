@@ -127,7 +127,10 @@ export async function runAgent(opts: {
 			headers: { 'content-type': 'application/json', authorization: `Bearer ${config.apiKey}` },
 			body: JSON.stringify({ model: config.model, messages: convo, tools: TOOLS })
 		});
-		if (!res.ok) throw new Error(`llm request failed: ${res.status}`);
+		if (!res.ok) {
+			const body = await res.text().catch(() => '');
+			throw new Error(`llm request failed: ${res.status} ${body}`.trim());
+		}
 		const data = await res.json();
 		const choice = data.choices?.[0]?.message as LlmMessage | undefined;
 		if (!choice) throw new Error('llm response missing message');
