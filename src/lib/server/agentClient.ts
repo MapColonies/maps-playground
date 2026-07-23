@@ -96,7 +96,7 @@ function systemPrompt(files: File[], demoName?: string, description?: string): s
 		description ? `Description: ${description}` : '',
 		'Current files:',
 		list,
-		'Use the write_file and edit_file tools to make changes. Keep edits minimal and explain what you changed.'
+		'Only call write_file or edit_file when the user explicitly asks you to change the code. For questions, reviews, or discussion, reply in plain text and do NOT call any tool. Prefer edit_file over rewriting a whole file, keep edits minimal, and explain what you changed.'
 	]
 		.filter(Boolean)
 		.join('\n');
