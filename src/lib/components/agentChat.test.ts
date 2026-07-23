@@ -103,11 +103,15 @@ describe('agentChat.svelte', () => {
 		});
 		await fireEvent.click(getByText('Send'));
 		expect(getByText('Thinking…')).toBeInTheDocument();
+		// Send is locked on the waiting example.
+		expect((getByText('Send') as HTMLButtonElement).disabled).toBe(true);
 
 		// Simulate navigating to example B while the request is still in flight.
 		component.$set({ chatCacheKey: 'chat:B', messages: [] });
 		// The "Thinking…" indicator belongs to A, not the now-visible B.
 		await waitFor(() => expect(queryByText('Thinking…')).toBeNull());
+		// Send is usable on B even though A is still in flight.
+		expect((getByText('Send') as HTMLButtonElement).disabled).toBe(false);
 
 		releaseAgent();
 		await waitFor(() =>

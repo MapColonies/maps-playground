@@ -29,11 +29,18 @@
 	}
 
 	let input = '';
-	// The example a request is in flight for (null when idle). Scopes the
-	// "Thinking…" indicator to the chat that is actually waiting, so it doesn't
-	// bleed onto other examples when the user navigates mid-request.
-	let busyKey: string | null = null;
-	$: busy = busyKey !== null;
+	// The set of examples with a request in flight. Scoping to the current example
+	// keeps the "Thinking…" indicator and the disabled Send button on the chat that
+	// is actually waiting, so neither bleeds onto other examples during navigation —
+	// and lets different examples run requests concurrently.
+	let busyKeys = new Set<string>();
+	$: currentBusy = busyKeys.has(chatCacheKey);
+	function setBusy(key: string, on: boolean) {
+		const next = new Set(busyKeys);
+		if (on) next.add(key);
+		else next.delete(key);
+		busyKeys = next;
+	}
 	let error = '';
 	let models: string[] = [];
 	let selectedModel = '';
@@ -79,7 +86,7 @@
 	}
 
 	async function compress() {
-		if (busy) return;
+		if (currentBusy) return;
 		if (messages.length < 2) {
 			error = 'Nothing to compress yet.';
 			return;
@@ -87,7 +94,7 @@
 		const originKey = chatCacheKey;
 		const history = messages;
 		error = '';
-		busyKey = originKey;
+		setBusy(originKey, true);
 		try {
 			const res = await fetch('/api/agent/compress', {
 				method: 'POST',
@@ -106,13 +113,13 @@
 		} catch (e) {
 			if (originKey === chatCacheKey) error = `compress failed: ${(e as Error).message}`;
 		} finally {
-			busyKey = null;
+			setBusy(originKey, false);
 		}
 	}
 
 	async function send() {
 		const text = input.trim();
-		if (!text || busy) return;
+		if (!text || currentBusy) return;
 		// Intercept exact slash commands before they reach the model.
 		if (COMMANDS.some((c) => c.name === text.toLowerCase())) {
 			runCommand(text.toLowerCase());
@@ -126,7 +133,7 @@
 		const outgoing: ChatMessage[] = [...messages, { role: 'user', content: text }];
 		commitMessages(outgoing, originChat);
 		clearInputState();
-		busyKey = originChat;
+		setBusy(originChat, true);
 		try {
 			const res = await fetch('/api/agent', {
 				method: 'POST',
@@ -150,7 +157,7 @@
 		} catch (e) {
 			if (originChat === chatCacheKey) error = `request failed: ${(e as Error).message}`;
 		} finally {
-			busyKey = null;
+			setBusy(originChat, false);
 		}
 	}
 
@@ -243,7 +250,7 @@
 				<span class="whitespace-pre-wrap">{m.content}</span>
 			</div>
 		{/each}
-		{#if busyKey === chatCacheKey}
+		{#if currentBusy}
 			<div class="text-sm italic text-gray-400">Thinking…</div>
 		{/if}
 		{#if error}
@@ -291,7 +298,7 @@
 		<button
 			type="button"
 			on:click={send}
-			disabled={busy}
+			disabled={currentBusy}
 			class="mt-2 w-full rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
 		>
 			Send
