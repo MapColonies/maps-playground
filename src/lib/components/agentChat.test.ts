@@ -119,4 +119,91 @@ describe('agentChat.svelte', () => {
 		await waitFor(() => expect(captured).toHaveLength(1));
 		expect((captured[0] as { files: unknown }).files).toEqual([{ name: 'index.js', content: 'x' }]);
 	});
+
+	it('shows slash-command autocomplete when typing "/"', async () => {
+		vi.stubGlobal('fetch', mockFetch({ reply: 'x', files }));
+		const { getByPlaceholderText, getByText, findByText } = render(AgentChat, {
+			props: { files, onFilesChange: vi.fn(), demoName: 'demo', description: 'd' }
+		});
+		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
+		await fireEvent.input(getByPlaceholderText('Ask the agent to edit this demo…'), {
+			target: { value: '/' }
+		});
+		expect(await findByText('/clear')).toBeInTheDocument();
+		expect(getByText('/compress')).toBeInTheDocument();
+	});
+
+	it('/clear wipes the conversation without calling the model', async () => {
+		const fetchMock = mockFetch({ reply: 'should not happen', files });
+		vi.stubGlobal('fetch', fetchMock);
+		const onMessagesChange = vi.fn();
+		const { getByPlaceholderText, getByText } = render(AgentChat, {
+			props: {
+				files,
+				onFilesChange: vi.fn(),
+				messages: [{ role: 'user', content: 'hi' }],
+				onMessagesChange
+			}
+		});
+		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
+		await fireEvent.input(getByPlaceholderText('Ask the agent to edit this demo…'), {
+			target: { value: '/clear' }
+		});
+		await fireEvent.click(getByText('Send'));
+		await waitFor(() => expect(onMessagesChange).toHaveBeenLastCalledWith([]));
+		// only the models fetch happened — never /api/agent
+		expect(fetchMock.mock.calls.every((c) => !String(c[0]).endsWith('/api/agent'))).toBe(true);
+	});
+
+	it('/compress summarizes and replaces history via the compress endpoint', async () => {
+		const fetchMock = vi.fn(async (url: string) => {
+			if (String(url).endsWith('/api/agent/models')) {
+				return {
+					ok: true,
+					json: async () => ({ models: ['gpt-4o'], default: 'gpt-4o' })
+				} as Response;
+			}
+			if (String(url).endsWith('/api/agent/compress')) {
+				return { ok: true, json: async () => ({ summary: 'user changed zoom to 8.' }) } as Response;
+			}
+			return { ok: true, json: async () => ({ reply: 'x', files }) } as Response;
+		});
+		vi.stubGlobal('fetch', fetchMock);
+		const onMessagesChange = vi.fn();
+		const { getByPlaceholderText, getByText } = render(AgentChat, {
+			props: {
+				files,
+				onFilesChange: vi.fn(),
+				messages: [
+					{ role: 'user', content: 'set zoom to 8' },
+					{ role: 'assistant', content: 'done' }
+				],
+				onMessagesChange
+			}
+		});
+		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
+		await fireEvent.input(getByPlaceholderText('Ask the agent to edit this demo…'), {
+			target: { value: '/compress' }
+		});
+		await fireEvent.click(getByText('Send'));
+		await waitFor(() =>
+			expect(onMessagesChange).toHaveBeenLastCalledWith([
+				{ role: 'assistant', content: 'Summary of earlier conversation:\nuser changed zoom to 8.' }
+			])
+		);
+		expect(fetchMock.mock.calls.some((c) => String(c[0]).endsWith('/api/agent/compress'))).toBe(
+			true
+		);
+	});
+
+	it('the header info button toggles a command summary', async () => {
+		vi.stubGlobal('fetch', mockFetch({ reply: 'x', files }));
+		const { getByText, getByLabelText, queryByText, findByText } = render(AgentChat, {
+			props: { files, onFilesChange: vi.fn(), demoName: 'demo', description: 'd' }
+		});
+		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
+		expect(queryByText('Chat commands')).toBeNull();
+		await fireEvent.click(getByLabelText('About chat commands'));
+		expect(await findByText('Chat commands')).toBeInTheDocument();
+	});
 });
