@@ -5,6 +5,7 @@ import {
 	saveCache,
 	clearCache,
 	chatKey,
+	chatKeyPrefix,
 	loadChat,
 	saveChat,
 	clearChat
@@ -81,6 +82,13 @@ describe('chat cache', () => {
 	it('builds a chat-namespaced key distinct from the files key', () => {
 		expect(chatKey('acme', 'x')).toBe('demo-chat:v1:acme/x');
 		expect(chatKey('acme', 'x')).not.toBe(cacheKey('acme', 'x'));
+	});
+
+	it('chatKeyPrefix is the shared prefix of that client’s chat keys', () => {
+		expect(chatKeyPrefix('acme')).toBe('demo-chat:v1:acme/');
+		expect(chatKey('acme', 'x').startsWith(chatKeyPrefix('acme'))).toBe(true);
+		// A different client does not match the prefix.
+		expect(chatKey('other', 'x').startsWith(chatKeyPrefix('acme'))).toBe(false);
 	});
 
 	it('round-trips a messages array through save/load', () => {

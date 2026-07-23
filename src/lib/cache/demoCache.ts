@@ -15,6 +15,12 @@ export function chatKey(client: string, name: string): string {
 	return `${CHAT_NAMESPACE}:${client}/${name}`;
 }
 
+// Prefix shared by every chatKey of a client — lets callers test whether any of a
+// client's examples matches without enumerating the client's item list.
+export function chatKeyPrefix(client: string): string {
+	return `${CHAT_NAMESPACE}:${client}/`;
+}
+
 export function loadCache(key: string): File[] | null {
 	if (!available()) return null;
 	const raw = localStorage.getItem(key);

@@ -16,6 +16,7 @@
 		clearChat
 	} from '$lib/cache/demoCache';
 	import type { ChatMessage } from '$lib/types';
+	import { markUnread, markRead } from '$lib/stores/unreadChats';
 
 	export let data;
 
@@ -39,7 +40,10 @@
 		files = cached ?? data.files;
 		fromCache = cached !== null;
 		// Chat history is per-example; restore this example's thread (or start empty).
-		chat = loadChat(chatKey($page.params.client, $page.params.name)) ?? [];
+		const ck = chatKey($page.params.client, $page.params.name);
+		chat = loadChat(ck) ?? [];
+		// Viewing an example clears its unread agent-response flag.
+		markRead(ck);
 		loadedKey = k;
 	}
 
@@ -77,7 +81,13 @@
 	// Persist to the originating example; only reflect it if still viewing that one.
 	function handleChatChange(next: ChatMessage[], originKey: string) {
 		saveChat(originKey, next);
-		if (originKey === chatK) chat = next;
+		if (originKey === chatK) {
+			chat = next;
+		} else if (next.at(-1)?.role === 'assistant') {
+			// A reply landed for an example we've since navigated away from — flag it
+			// so the bottom nav shows an unread dot on that example's tab.
+			markUnread(originKey);
+		}
 	}
 
 	function handleClear() {
