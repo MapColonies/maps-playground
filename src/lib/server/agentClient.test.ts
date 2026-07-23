@@ -82,6 +82,21 @@ describe('runAgent', () => {
 		expect(out.files).toEqual(files);
 	});
 
+	it('feeds the full file contents to the model, not just names', async () => {
+		const { fn, calls } = mockFetchSequence([
+			{ choices: [{ message: { role: 'assistant', content: 'ok' } }] }
+		]);
+		await runAgent({
+			files: [{ name: 'wmts.js', content: "import { TOKEN } from './config/common-config.js';" }],
+			messages: [{ role: 'user', content: 'suggest improvements' }],
+			config: cfg(fn)
+		});
+		const system = calls[0].messages[0].content;
+		expect(system).toContain('wmts.js');
+		// the actual code — including its real import path — must be visible
+		expect(system).toContain("import { TOKEN } from './config/common-config.js';");
+	});
+
 	it('applies a tool call then returns the final reply', async () => {
 		const { fn } = mockFetchSequence([
 			{
@@ -113,6 +128,73 @@ describe('runAgent', () => {
 		});
 		expect(out.reply).toBe('done');
 		expect(out.files).toEqual([{ name: 'a.js', content: '2' }]);
+	});
+
+	it('normalizes object tool arguments so they replay as a JSON string', async () => {
+		// Cohere-style: arguments arrives as a parsed object, not a string.
+		const { fn, calls } = mockFetchSequence([
+			{
+				choices: [
+					{
+						message: {
+							role: 'assistant',
+							content: null,
+							tool_calls: [
+								{
+									id: 't1',
+									type: 'function',
+									function: {
+										name: 'edit_file',
+										arguments: { name: 'a.js', old_string: '1', new_string: '2' }
+									}
+								}
+							]
+						}
+					}
+				]
+			},
+			{ choices: [{ message: { role: 'assistant', content: 'done' } }] }
+		]);
+		const out = await runAgent({
+			files: [{ name: 'a.js', content: '1' }],
+			messages: [{ role: 'user', content: 'apply it' }],
+			config: cfg(fn)
+		});
+		// the edit still applied from the object args
+		expect(out.files).toEqual([{ name: 'a.js', content: '2' }]);
+		// and the echoed assistant turn carries arguments as a string, not an object
+		const echoed = calls[1].messages.find((m: any) => m.role === 'assistant' && m.tool_calls);
+		expect(typeof echoed.tool_calls[0].function.arguments).toBe('string');
+	});
+
+	it('re-serializes empty/garbage tool arguments to a JSON object string', async () => {
+		// arguments = '' would 400 as "not a stringified JSON object" on replay.
+		const { fn, calls } = mockFetchSequence([
+			{
+				choices: [
+					{
+						message: {
+							role: 'assistant',
+							content: null,
+							tool_calls: [
+								{ id: 't1', type: 'function', function: { name: 'write_file', arguments: '' } }
+							]
+						}
+					}
+				]
+			},
+			{ choices: [{ message: { role: 'assistant', content: 'done' } }] }
+		]);
+		await runAgent({
+			files: [{ name: 'a.js', content: '1' }],
+			messages: [{ role: 'user', content: 'go' }],
+			config: cfg(fn)
+		});
+		const echoed = calls[1].messages.find((m: any) => m.role === 'assistant' && m.tool_calls);
+		const replayed = echoed.tool_calls[0].function.arguments;
+		expect(typeof replayed).toBe('string');
+		// a stringified JSON *object*, parseable and non-array
+		expect(JSON.parse(replayed)).toEqual({});
 	});
 
 	it('feeds a tool error back and keeps looping', async () => {
@@ -150,7 +232,7 @@ describe('runAgent', () => {
 		expect(toolMsg.content).toMatch(/not found/);
 	});
 
-	it('respects the iteration cap', async () => {
+	it('withholds tools on the final step so the model must answer in text', async () => {
 		const toolResp = {
 			choices: [
 				{
@@ -171,7 +253,81 @@ describe('runAgent', () => {
 				}
 			]
 		};
-		const { fn } = mockFetchSequence([toolResp, toolResp, toolResp]);
+		// Second (final) call has tool_choice 'none', so the model returns prose.
+		const textResp = { choices: [{ message: { role: 'assistant', content: 'here is my advice' } }] };
+		const { fn, calls } = mockFetchSequence([toolResp, textResp]);
+		const out = await runAgent({
+			files: [{ name: 'a.js', content: '1' }],
+			messages: [{ role: 'user', content: 'how can I improve this?' }],
+			config: { ...cfg(fn), maxIterations: 2 }
+		});
+		expect(fn).toHaveBeenCalledTimes(2);
+		// first step offers tools, last step omits them entirely (no provider can
+		// return another tool call, regardless of tool_choice support)
+		expect(calls[0].tools).toBeDefined();
+		expect(calls[1].tools).toBeUndefined();
+		// user gets a real answer, not the bare tool-limit stub
+		expect(out.reply).toBe('here is my advice');
+	});
+
+	it('does not surface prior-turn assistant text in the cap note', async () => {
+		const toolResp = {
+			choices: [
+				{
+					message: {
+						role: 'assistant',
+						content: null,
+						tool_calls: [
+							{
+								id: 'x',
+								type: 'function',
+								function: {
+									name: 'write_file',
+									arguments: JSON.stringify({ name: 'a.js', content: 'z' })
+								}
+							}
+						]
+					}
+				}
+			]
+		};
+		const { fn } = mockFetchSequence([toolResp, toolResp]);
+		const out = await runAgent({
+			files: [{ name: 'a.js', content: '1' }],
+			messages: [
+				{ role: 'user', content: 'earlier ask' },
+				{ role: 'assistant', content: 'STALE previous reply' },
+				{ role: 'user', content: 'now do it' }
+			],
+			config: { ...cfg(fn), maxIterations: 2 }
+		});
+		// the cap note must not echo the earlier assistant turn from history
+		expect(out.reply).not.toMatch(/STALE previous reply/);
+		expect(out.reply).toMatch(/tool limit/i);
+	});
+
+	it('falls back to the cap note if the model still emits only tool calls', async () => {
+		const toolResp = {
+			choices: [
+				{
+					message: {
+						role: 'assistant',
+						content: 'still going',
+						tool_calls: [
+							{
+								id: 'x',
+								type: 'function',
+								function: {
+									name: 'write_file',
+									arguments: JSON.stringify({ name: 'a.js', content: 'z' })
+								}
+							}
+						]
+					}
+				}
+			]
+		};
+		const { fn } = mockFetchSequence([toolResp, toolResp]);
 		const out = await runAgent({
 			files: [{ name: 'a.js', content: '1' }],
 			messages: [{ role: 'user', content: 'go' }],

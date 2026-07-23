@@ -84,12 +84,19 @@ export interface AgentConfig {
 interface LlmMessage {
 	role: 'system' | 'user' | 'assistant' | 'tool';
 	content: string | null;
-	tool_calls?: { id: string; type: 'function'; function: { name: string; arguments: string } }[];
+	// arguments should be a JSON string, but some providers return a parsed object.
+	tool_calls?: {
+		id: string;
+		type: 'function';
+		function: { name: string; arguments: string | Record<string, unknown> };
+	}[];
 	tool_call_id?: string;
 }
 
 function systemPrompt(files: File[], demoName?: string, description?: string): string {
-	const list = files.map((f) => `- ${f.name}`).join('\n');
+	const contents = files
+		.map((f) => `--- ${f.name} ---\n${f.content}`)
+		.join('\n\n');
 	return [
 		'You are a coding assistant working inside the MapColonies Playground.',
 		'This is a sandbox of small, self-contained code examples that each demonstrate one technique:',
@@ -99,12 +106,34 @@ function systemPrompt(files: File[], demoName?: string, description?: string): s
 		'Do NOT suggest production-app concerns that do not apply to a sandbox snippet — no build tooling, test frameworks, TypeScript migration, CI, package managers, or deployment/security hardening — unless the user explicitly asks.',
 		demoName ? `Demo: ${demoName}` : '',
 		description ? `Description: ${description}` : '',
+		'The full current contents of every file are given below. This is the ONLY source of truth about the code —',
+		'base every edit and every claim strictly on what is actually written here, never on assumptions about how these libraries are usually imported or wired.',
+		'Do NOT invent or rewrite import paths, module names, exported symbols, or globals: reuse the exact import specifiers already present in these files (e.g. relative paths like ./config/common-config.js, or the CDN/global setup the example already relies on).',
+		'If a change would need a symbol or module that is not already imported here, say so in plain text instead of guessing an import path.',
 		'Current files:',
-		list,
-		'Only call write_file or edit_file when the user explicitly asks you to change the code. For questions, reviews, or discussion, reply in plain text and do NOT call any tool. Prefer edit_file over rewriting a whole file, keep edits minimal, and explain what you changed.'
+		contents,
+		'Only call write_file or edit_file when the user explicitly asks you to change the code. For questions, reviews, or discussion, reply in plain text and do NOT call any tool. Prefer edit_file over rewriting a whole file, keep edits minimal, preserve the existing imports and structure, and explain what you changed.',
+		'Keep your chat replies short and to the point: a few sentences or a short bullet list. Lead with the answer, skip preamble and restating the question, and do not dump full-file rewrites or long multi-section plans in chat. This brevity rule applies ONLY to your prose — never trade away correctness, needed detail, or completeness in the actual code you write.'
 	]
 		.filter(Boolean)
 		.join('\n');
+}
+
+// Coerce whatever a provider put in tool_call.function.arguments into a plain
+// JSON object. Accepts a JSON string, an already-parsed object, or garbage;
+// anything that isn't a JSON object (array, empty string, null, invalid JSON)
+// collapses to {}.
+function normalizeToolArgs(raw: string | Record<string, unknown> | undefined): Record<string, unknown> {
+	let value: unknown = raw;
+	if (typeof raw === 'string') {
+		try {
+			value = JSON.parse(raw || '{}');
+		} catch {
+			value = {};
+		}
+	}
+	if (typeof value !== 'object' || value === null || Array.isArray(value)) return {};
+	return value as Record<string, unknown>;
 }
 
 export async function runAgent(opts: {
@@ -123,14 +152,26 @@ export async function runAgent(opts: {
 		{ role: 'system', content: systemPrompt(files, opts.demoName, opts.description) },
 		...opts.messages.map((m) => ({ role: m.role, content: m.content }))
 	];
+	// Everything appended from here on belongs to THIS run; the fallback below
+	// must not surface stale assistant text carried in from prior turns.
+	const runStart = convo.length;
 
 	for (let i = 0; i < maxIterations; i++) {
 		// Rebuild the system prompt so its file list reflects edits applied so far.
 		convo[0] = { role: 'system', content: systemPrompt(files, opts.demoName, opts.description) };
+		// On the last allowed step, omit the tools entirely so the model is forced
+		// to emit a plain-text answer. tool_choice:'none' is not honored by every
+		// provider (Cohere via LiteLLM ignores it); dropping `tools` is the only
+		// way no provider can return another tool call and leave us the cap stub.
+		const isLastStep = i === maxIterations - 1;
 		const res = await doFetch(`${config.baseUrl}/v1/chat/completions`, {
 			method: 'POST',
 			headers: { 'content-type': 'application/json', authorization: `Bearer ${config.apiKey}` },
-			body: JSON.stringify({ model: config.model, messages: convo, tools: TOOLS })
+			body: JSON.stringify(
+				isLastStep
+					? { model: config.model, messages: convo }
+					: { model: config.model, messages: convo, tools: TOOLS }
+			)
 		});
 		if (!res.ok) {
 			const body = await res.text().catch(() => '');
@@ -139,28 +180,36 @@ export async function runAgent(opts: {
 		const data = await res.json();
 		const choice = data.choices?.[0]?.message as LlmMessage | undefined;
 		if (!choice) throw new Error('llm response missing message');
-		convo.push(choice);
 
 		const toolCalls = choice.tool_calls ?? [];
+		// Canonicalize every tool call's arguments to a stringified JSON object.
+		// Providers (e.g. Cohere via LiteLLM) reject the echoed assistant turn with
+		// "arguments must be a stringified JSON object" when arguments arrive as a
+		// parsed object, an empty string, an array, or otherwise non-object JSON.
+		// This single pass fixes both the replay and what we hand to applyTool.
+		const parsedArgs = toolCalls.map((call) => {
+			const args = normalizeToolArgs(call.function.arguments);
+			call.function.arguments = JSON.stringify(args);
+			return args;
+		});
+		convo.push(choice);
+
 		if (toolCalls.length === 0) {
 			return { reply: choice.content ?? '', files };
 		}
 
-		for (const call of toolCalls) {
-			let args: Record<string, unknown> = {};
-			try {
-				args = JSON.parse(call.function.arguments || '{}');
-			} catch {
-				args = {};
-			}
-			const applied = applyTool(files, call.function.name, args);
+		toolCalls.forEach((call, idx) => {
+			const applied = applyTool(files, call.function.name, parsedArgs[idx]);
 			files = applied.files;
 			convo.push({ role: 'tool', tool_call_id: call.id, content: applied.result });
-		}
+		});
 	}
 
 	const lastText =
-		[...convo].reverse().find((m) => m.role === 'assistant' && m.content)?.content ?? '';
+		convo
+			.slice(runStart)
+			.reverse()
+			.find((m) => m.role === 'assistant' && m.content)?.content ?? '';
 	const capNote = `Stopped after the ${maxIterations}-step tool limit; changes so far are applied.`;
 	return { reply: lastText ? `${capNote}\n\n${lastText}` : capNote, files };
 }
