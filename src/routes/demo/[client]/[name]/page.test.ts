@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { get, writable, type Writable } from 'svelte/store';
-import { cacheKey } from '$lib/cache/demoCache';
+import { cacheKey, chatKey } from '$lib/cache/demoCache';
 import type { File } from '$lib/types';
 
 const dataFiles: File[] = [{ name: 'index.js', content: 'ORIGINAL' }];
@@ -81,7 +81,7 @@ describe('+page.svelte', () => {
 
 	it('shows no banner and uses server files when the cache is empty', async () => {
 		const { currentFiles } = await renderPage();
-		expect(screen.queryByText('Loaded from cache')).toBeNull();
+		expect(screen.queryByText('Example loaded from cache')).toBeNull();
 		expect(currentFiles()).toEqual(dataFiles);
 	});
 
@@ -89,7 +89,7 @@ describe('+page.svelte', () => {
 		const key = cacheKey('acme', 'demo1');
 		localStorage.setItem(key, JSON.stringify(editedFiles));
 		const { currentFiles } = await renderPage();
-		expect(screen.getByText('Loaded from cache')).toBeInTheDocument();
+		expect(screen.getByText('Example loaded from cache')).toBeInTheDocument();
 		expect(currentFiles()).toEqual(editedFiles);
 	});
 
@@ -134,6 +134,22 @@ describe('+page.svelte', () => {
 		expect(localStorage.getItem(key)).not.toBeNull();
 	});
 
+	it('ignores an onChange echoing the baseline files (no save, no banner)', async () => {
+		const { key, edit } = await renderPage();
+		edit(dataFiles);
+		vi.advanceTimersByTime(500);
+		expect(localStorage.getItem(key)).toBeNull();
+		expect(screen.queryByText('Example loaded from cache')).toBeNull();
+	});
+
+	it('shows the banner as soon as an edit is persisted, without navigating away', async () => {
+		const { edit } = await renderPage();
+		expect(screen.queryByText('Example loaded from cache')).toBeNull();
+		edit(editedFiles);
+		vi.advanceTimersByTime(500);
+		expect(await screen.findByText('Example loaded from cache')).toBeInTheDocument();
+	});
+
 	it('collapses rapid edits into a single persisted save', async () => {
 		const { key, edit } = await renderPage();
 		edit([{ name: 'index.js', content: 'A' }]);
@@ -152,7 +168,7 @@ describe('+page.svelte', () => {
 		await renderPage();
 		await fireEvent.click(screen.getByText('Clear cache'));
 		expect(localStorage.getItem(key)).not.toBeNull();
-		expect(screen.getByText('Loaded from cache')).toBeInTheDocument();
+		expect(screen.getByText('Example loaded from cache')).toBeInTheDocument();
 	});
 
 	it('clears the cache, resets files, and hides the banner when Clear is confirmed', async () => {
@@ -162,19 +178,32 @@ describe('+page.svelte', () => {
 		const { currentFiles } = await renderPage();
 		await fireEvent.click(screen.getByText('Clear cache'));
 		expect(localStorage.getItem(key)).toBeNull();
-		expect(screen.queryByText('Loaded from cache')).toBeNull();
+		expect(screen.queryByText('Example loaded from cache')).toBeNull();
 		expect(currentFiles()).toEqual(dataFiles);
+	});
+
+	it('keeps the agent chat thread when Clear cache is confirmed', async () => {
+		const key = cacheKey('acme', 'demo1');
+		const ck = chatKey('acme', 'demo1');
+		const thread = [{ role: 'user', content: 'hi' }];
+		localStorage.setItem(key, JSON.stringify(editedFiles));
+		localStorage.setItem(ck, JSON.stringify(thread));
+		vi.spyOn(window, 'confirm').mockReturnValue(true);
+		await renderPage();
+		await fireEvent.click(screen.getByText('Clear cache'));
+		expect(localStorage.getItem(key)).toBeNull();
+		expect(JSON.parse(localStorage.getItem(ck) as string)).toEqual(thread);
 	});
 
 	it('reloads cache state when the route params change', async () => {
 		const otherKey = cacheKey('acme', 'demo2');
 		localStorage.setItem(otherKey, JSON.stringify(editedFiles));
 		const { pageStore, currentFiles } = await renderPage({ name: 'demo1' });
-		expect(screen.queryByText('Loaded from cache')).toBeNull();
+		expect(screen.queryByText('Example loaded from cache')).toBeNull();
 
 		pageStore.set({ params: { client: 'acme', name: 'demo2' } });
 		await Promise.resolve();
-		expect(await screen.findByText('Loaded from cache')).toBeInTheDocument();
+		expect(await screen.findByText('Example loaded from cache')).toBeInTheDocument();
 		expect(currentFiles()).toEqual(editedFiles);
 	});
 });

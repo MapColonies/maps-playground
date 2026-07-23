@@ -12,8 +12,7 @@
 		clearCache,
 		chatKey,
 		loadChat,
-		saveChat,
-		clearChat
+		saveChat
 	} from '$lib/cache/demoCache';
 	import type { ChatMessage } from '$lib/types';
 	import { markUnread, markRead } from '$lib/stores/unreadChats';
@@ -61,9 +60,17 @@
 	});
 
 	function handleChange(edited: File[]) {
+		// Flems echoes an onChange with the initial files on mount; ignore changes that
+		// match the current baseline so merely opening an example never caches or banners.
+		if (JSON.stringify(edited) === JSON.stringify(files)) return;
 		const savingKey = key;
 		if (saveTimer) clearTimeout(saveTimer);
-		saveTimer = setTimeout(() => saveCache(savingKey, edited), debounceMs);
+		saveTimer = setTimeout(() => {
+			saveCache(savingKey, edited);
+			// Reflect the freshly-written cache in the banner, but only if the user is
+			// still viewing the example we just saved (they may have navigated away).
+			if (savingKey === key) fromCache = true;
+		}, debounceMs);
 	}
 
 	// Agent edits are bound to the example they were issued from (originKey), so a
@@ -93,10 +100,9 @@
 	function handleClear() {
 		if (!window.confirm('Discard your edits and reload the original example?')) return;
 		if (saveTimer) clearTimeout(saveTimer);
+		// Only the file edits are discarded; the agent chat thread is kept intact.
 		clearCache(key);
-		clearChat(chatK);
 		files = data.files;
-		chat = [];
 		fromCache = false;
 	}
 </script>
@@ -107,7 +113,7 @@
 			class="flex items-center justify-between gap-3 px-4 py-2 text-sm bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200"
 		>
 			<span class="flex items-center gap-2">
-				<span aria-hidden="true">⟳</span> Loaded from cache
+				<span aria-hidden="true">⟳</span> Example loaded from cache
 			</span>
 			<button
 				type="button"
