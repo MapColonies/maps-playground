@@ -178,3 +178,32 @@ export async function fetchModels(config: {
 	const data = await res.json();
 	return (data.data ?? []).map((m: { id: string }) => m.id);
 }
+
+// Collapse a chat history into a short summary. No tools are offered, so this
+// call can never edit files — it only reads the conversation and returns text.
+export async function summarizeConversation(opts: {
+	messages: ChatMessage[];
+	config: AgentConfig;
+}): Promise<string> {
+	const { config } = opts;
+	const doFetch = config.fetchFn ?? fetch;
+	const convo = [
+		{
+			role: 'system',
+			content:
+				'Summarize the following conversation concisely, preserving the decisions made and any changes to the demo files. Output only the summary text.'
+		},
+		...opts.messages.map((m) => ({ role: m.role, content: m.content }))
+	];
+	const res = await doFetch(`${config.baseUrl}/v1/chat/completions`, {
+		method: 'POST',
+		headers: { 'content-type': 'application/json', authorization: `Bearer ${config.apiKey}` },
+		body: JSON.stringify({ model: config.model, messages: convo })
+	});
+	if (!res.ok) {
+		const body = await res.text().catch(() => '');
+		throw new Error(`summarize request failed: ${res.status} ${body}`.trim());
+	}
+	const data = await res.json();
+	return (data.choices?.[0]?.message?.content ?? '') as string;
+}

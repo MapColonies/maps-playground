@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { applyTool, runAgent, fetchModels } from './agentClient';
+import { applyTool, runAgent, fetchModels, summarizeConversation } from './agentClient';
 import type { File } from '$lib/types';
 
 const base: File[] = [{ name: 'index.js', content: 'const zoom = 4;\n' }];
@@ -184,7 +184,8 @@ describe('runAgent', () => {
 
 	it('throws on a non-ok response', async () => {
 		const fn = vi.fn(
-			async () => ({ ok: false, status: 500, text: async () => 'server boom' } as unknown as Response)
+			async () =>
+				({ ok: false, status: 500, text: async () => 'server boom' } as unknown as Response)
 		);
 		await expect(
 			runAgent({ files: [], messages: [{ role: 'user', content: 'x' }], config: cfg(fn) })
@@ -210,5 +211,32 @@ describe('fetchModels', () => {
 		await expect(fetchModels({ baseUrl: 'http://p', apiKey: 'k', fetchFn: fn })).rejects.toThrow(
 			/401/
 		);
+	});
+});
+
+describe('summarizeConversation', () => {
+	it('summarizes with no tools and returns the content', async () => {
+		const { fn, calls } = mockFetchSequence([
+			{ choices: [{ message: { role: 'assistant', content: 'Summary: did X and Y.' } }] }
+		]);
+		const out = await summarizeConversation({
+			messages: [
+				{ role: 'user', content: 'a' },
+				{ role: 'assistant', content: 'b' }
+			],
+			config: cfg(fn)
+		});
+		expect(out).toBe('Summary: did X and Y.');
+		// summarization must not offer tools — it should never edit files
+		expect(calls[0].tools).toBeUndefined();
+	});
+
+	it('throws on a non-ok response', async () => {
+		const fn = vi.fn(
+			async () => ({ ok: false, status: 500, text: async () => 'boom' } as unknown as Response)
+		);
+		await expect(
+			summarizeConversation({ messages: [{ role: 'user', content: 'a' }], config: cfg(fn) })
+		).rejects.toThrow(/500/);
 	});
 });
