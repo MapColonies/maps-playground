@@ -29,7 +29,11 @@
 	}
 
 	let input = '';
-	let busy = false;
+	// The example a request is in flight for (null when idle). Scopes the
+	// "Thinking…" indicator to the chat that is actually waiting, so it doesn't
+	// bleed onto other examples when the user navigates mid-request.
+	let busyKey: string | null = null;
+	$: busy = busyKey !== null;
 	let error = '';
 	let models: string[] = [];
 	let selectedModel = '';
@@ -83,7 +87,7 @@
 		const originKey = chatCacheKey;
 		const history = messages;
 		error = '';
-		busy = true;
+		busyKey = originKey;
 		try {
 			const res = await fetch('/api/agent/compress', {
 				method: 'POST',
@@ -102,7 +106,7 @@
 		} catch (e) {
 			if (originKey === chatCacheKey) error = `compress failed: ${(e as Error).message}`;
 		} finally {
-			busy = false;
+			busyKey = null;
 		}
 	}
 
@@ -122,7 +126,7 @@
 		const outgoing: ChatMessage[] = [...messages, { role: 'user', content: text }];
 		commitMessages(outgoing, originChat);
 		clearInputState();
-		busy = true;
+		busyKey = originChat;
 		try {
 			const res = await fetch('/api/agent', {
 				method: 'POST',
@@ -146,7 +150,7 @@
 		} catch (e) {
 			if (originChat === chatCacheKey) error = `request failed: ${(e as Error).message}`;
 		} finally {
-			busy = false;
+			busyKey = null;
 		}
 	}
 
@@ -239,7 +243,7 @@
 				<span class="whitespace-pre-wrap">{m.content}</span>
 			</div>
 		{/each}
-		{#if busy}
+		{#if busyKey === chatCacheKey}
 			<div class="text-sm italic text-gray-400">Thinking…</div>
 		{/if}
 		{#if error}

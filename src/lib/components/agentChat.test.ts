@@ -87,7 +87,7 @@ describe('agentChat.svelte', () => {
 		});
 		vi.stubGlobal('fetch', fetchMock);
 		const onMessagesChange = vi.fn();
-		const { getByPlaceholderText, getByText, component } = render(AgentChat, {
+		const { getByPlaceholderText, getByText, queryByText, component } = render(AgentChat, {
 			props: {
 				files,
 				onFilesChange: vi.fn(),
@@ -102,9 +102,12 @@ describe('agentChat.svelte', () => {
 			target: { value: 'question on A' }
 		});
 		await fireEvent.click(getByText('Send'));
+		expect(getByText('Thinking…')).toBeInTheDocument();
 
 		// Simulate navigating to example B while the request is still in flight.
 		component.$set({ chatCacheKey: 'chat:B', messages: [] });
+		// The "Thinking…" indicator belongs to A, not the now-visible B.
+		await waitFor(() => expect(queryByText('Thinking…')).toBeNull());
 
 		releaseAgent();
 		await waitFor(() =>
