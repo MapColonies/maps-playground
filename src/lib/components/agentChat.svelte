@@ -18,7 +18,7 @@
 	// Slash commands handled entirely client-side — they never reach the model.
 	const COMMANDS = [
 		{ name: '/clear', desc: 'Clear the conversation history' },
-		{ name: '/compress', desc: 'Summarize the conversation to save context' }
+		{ name: '/compact', desc: 'Summarize the conversation to save context' }
 	];
 
 	// Reflect a message list: notify the parent so it persists to originKey, and
@@ -74,8 +74,8 @@
 			error = '';
 			// Persist the emptied thread for this example (overrides its cache).
 			commitMessages([], chatCacheKey);
-		} else if (name === '/compress') {
-			compress();
+		} else if (name === '/compact') {
+			compact();
 		}
 	}
 
@@ -85,10 +85,10 @@
 		activeSuggestion = 0;
 	}
 
-	async function compress() {
+	async function compact() {
 		if (currentBusy) return;
 		if (messages.length < 2) {
-			error = 'Nothing to compress yet.';
+			error = 'Nothing to compact yet.';
 			return;
 		}
 		const originKey = chatCacheKey;
@@ -96,7 +96,7 @@
 		error = '';
 		setBusy(originKey, true);
 		try {
-			const res = await fetch('/api/agent/compress', {
+			const res = await fetch('/api/agent/compact', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({ messages: history, model: selectedModel })
@@ -111,7 +111,7 @@
 				);
 			}
 		} catch (e) {
-			if (originKey === chatCacheKey) error = `compress failed: ${(e as Error).message}`;
+			if (originKey === chatCacheKey) error = `compact failed: ${(e as Error).message}`;
 		} finally {
 			setBusy(originKey, false);
 		}
@@ -222,7 +222,7 @@
 							this example.
 						</p>
 						<p>
-							<code class="font-mono font-semibold">/compress</code> — summarize the conversation into
+							<code class="font-mono font-semibold">/compact</code> — summarize the conversation into
 							a short recap to save context and tokens.
 						</p>
 					</div>

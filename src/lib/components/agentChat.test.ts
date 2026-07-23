@@ -192,7 +192,7 @@ describe('agentChat.svelte', () => {
 			target: { value: '/' }
 		});
 		expect(await findByText('/clear')).toBeInTheDocument();
-		expect(getByText('/compress')).toBeInTheDocument();
+		expect(getByText('/compact')).toBeInTheDocument();
 	});
 
 	it('/clear wipes the conversation for its example without calling the model', async () => {
@@ -218,7 +218,7 @@ describe('agentChat.svelte', () => {
 		expect(fetchMock.mock.calls.every((c) => !String(c[0]).endsWith('/api/agent'))).toBe(true);
 	});
 
-	it('/compress summarizes and replaces history for its example', async () => {
+	it('/compact summarizes and replaces history for its example', async () => {
 		const fetchMock = vi.fn(async (url: string) => {
 			if (String(url).endsWith('/api/agent/models')) {
 				return {
@@ -226,7 +226,7 @@ describe('agentChat.svelte', () => {
 					json: async () => ({ models: ['gpt-4o'], default: 'gpt-4o' })
 				} as Response;
 			}
-			if (String(url).endsWith('/api/agent/compress')) {
+			if (String(url).endsWith('/api/agent/compact')) {
 				return { ok: true, json: async () => ({ summary: 'user changed zoom to 8.' }) } as Response;
 			}
 			return { ok: true, json: async () => ({ reply: 'x', files }) } as Response;
@@ -247,7 +247,7 @@ describe('agentChat.svelte', () => {
 		});
 		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
 		await fireEvent.input(getByPlaceholderText('Ask the agent to edit this demo…'), {
-			target: { value: '/compress' }
+			target: { value: '/compact' }
 		});
 		await fireEvent.click(getByText('Send'));
 		await waitFor(() =>
@@ -261,7 +261,7 @@ describe('agentChat.svelte', () => {
 				'chat:A'
 			)
 		);
-		expect(fetchMock.mock.calls.some((c) => String(c[0]).endsWith('/api/agent/compress'))).toBe(
+		expect(fetchMock.mock.calls.some((c) => String(c[0]).endsWith('/api/agent/compact'))).toBe(
 			true
 		);
 	});

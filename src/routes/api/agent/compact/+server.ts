@@ -27,7 +27,7 @@ export async function POST({ request, url }) {
 		});
 		return json({ summary });
 	} catch (e) {
-		console.error('compress request failed:', e);
-		throw error(502, 'compress request failed');
+		console.error('compact request failed:', e);
+		throw error(502, 'compact request failed');
 	}
 }
