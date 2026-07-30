@@ -91,7 +91,6 @@ route:
   https: true
   path: /
   host: playground
-  wildcardPolicy: None
   port:
     targetPort: http
   tls:
