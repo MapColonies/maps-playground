@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.3.0](https://github.com/MapColonies/maps-playground/compare/v1.2.0...v1.3.0) (2026-07-30)
+
+
+### Features
+
+* **agent:** chat panel to edit selected demo via LiteLLM ([#23](https://github.com/MapColonies/maps-playground/issues/23)) ([27a82f8](https://github.com/MapColonies/maps-playground/commit/27a82f82b7ff6b8ffe16216e7514cf50cc63c51d))
+* **agent:** render markdown and highlight code in chat replies ([#28](https://github.com/MapColonies/maps-playground/issues/28)) ([5fe858f](https://github.com/MapColonies/maps-playground/commit/5fe858fa7f88051aee204c35e679238972477f1e))
+* app-usage Prometheus metrics + Grafana dashboard + Helm scrape ([#22](https://github.com/MapColonies/maps-playground/issues/22)) ([3728bc8](https://github.com/MapColonies/maps-playground/commit/3728bc899f9a98e2dd4b73cc98f006b4e97ddc51))
+* **demo:** collapse buttons for agent and info panels ([#29](https://github.com/MapColonies/maps-playground/issues/29)) ([e504b0d](https://github.com/MapColonies/maps-playground/commit/e504b0dc8ab7bf234a67b6e9de2b4a418ed8a4b8))
+
 ## [1.2.0](https://github.com/MapColonies/maps-playground/compare/v1.1.1...v1.2.0) (2026-07-21)
 
 
