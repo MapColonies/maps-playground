@@ -195,6 +195,20 @@ describe('+page.svelte', () => {
 		expect(JSON.parse(localStorage.getItem(ck) as string)).toEqual(thread);
 	});
 
+	it('collapses and re-expands the info panel', async () => {
+		await renderPage();
+		const collapse = screen.getByLabelText('Collapse info panel');
+		expect(screen.queryByLabelText('Expand info panel')).toBeNull();
+
+		await fireEvent.click(collapse);
+		expect(screen.queryByLabelText('Collapse info panel')).toBeNull();
+		expect(screen.getByLabelText('Expand info panel')).toBeInTheDocument();
+
+		await fireEvent.click(screen.getByLabelText('Expand info panel'));
+		expect(screen.getByLabelText('Collapse info panel')).toBeInTheDocument();
+		expect(screen.queryByLabelText('Expand info panel')).toBeNull();
+	});
+
 	it('reloads cache state when the route params change', async () => {
 		const otherKey = cacheKey('acme', 'demo2');
 		localStorage.setItem(otherKey, JSON.stringify(editedFiles));
