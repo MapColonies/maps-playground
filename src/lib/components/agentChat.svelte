@@ -15,6 +15,8 @@
 	export let messages: ChatMessage[] = [];
 	export let onMessagesChange: (messages: ChatMessage[], originKey: string) => void = () =>
 		undefined;
+	// When provided, renders a collapse control in the header; the parent owns the state.
+	export let onCollapse: (() => void) | null = null;
 
 	// Slash commands handled entirely client-side — they never reach the model.
 	const COMMANDS = [
@@ -235,7 +237,20 @@
 <div class="flex h-full flex-col">
 	<header class="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
 		<div class="flex items-center justify-between">
-			<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Agent</h2>
+			<div class="flex items-center gap-2">
+				{#if onCollapse}
+					<button
+						type="button"
+						aria-label="Collapse agent panel"
+						title="Collapse agent panel"
+						on:click={onCollapse}
+						class="flex h-6 w-6 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+					>
+						<span aria-hidden="true">«</span>
+					</button>
+				{/if}
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Agent</h2>
+			</div>
 			<!-- Info shows on hover (and keyboard focus for a11y), not on click. -->
 			<div
 				class="relative"
