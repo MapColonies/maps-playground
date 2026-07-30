@@ -75,4 +75,29 @@ describe('flems.svelte', () => {
 		stubFlems();
 		expect(() => render(Flems, { props: { files, links } })).not.toThrow();
 	});
+
+	it('hands Flems a copy so its editor state cannot pollute our file objects', () => {
+		// Flems (CodeMirror) attaches circular editor state onto the file objects it
+		// receives. If we pass ours by reference, they stop being JSON-serializable,
+		// which breaks consumers that stringify the same array (e.g. the agent panel).
+		vi.stubGlobal('flems', document.createElement('div'));
+		vi.stubGlobal(
+			'Flems',
+			vi.fn((_el: unknown, config: { files: File[] }) => {
+				const f = config.files[0] as unknown as { doc?: unknown; content: string };
+				const doc: { lines: { text: string; parent?: unknown }[] } = {
+					lines: [{ text: f.content }]
+				};
+				doc.lines[0].parent = doc; // circular, like a CM Doc/Line
+				f.doc = doc;
+				return { onchange: () => undefined, set: () => undefined };
+			})
+		);
+
+		const original: File[] = [{ name: 'index.js', content: 'x' }];
+		render(Flems, { props: { files: original, links } });
+
+		expect(original[0]).not.toHaveProperty('doc');
+		expect(() => JSON.stringify(original)).not.toThrow();
+	});
 });

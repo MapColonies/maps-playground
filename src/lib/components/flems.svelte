@@ -15,6 +15,10 @@
 
 	let flemsInstance: any;
 
+	// Flems (CodeMirror) mutates the file objects it receives, attaching circular
+	// editor state. Hand it fresh copies so our own `files` stay plain/serializable.
+	const toPlainFiles = (fs: File[]) => fs.map((f) => ({ name: f.name, content: f.content }));
+
 	function wireOnChange() {
 		if (!flemsInstance || !onChange) return;
 		// Flems' `onchange` is a registrar you CALL to install a handler,
@@ -27,7 +31,7 @@
 	$: if (flemsInstance) {
 		flemsInstance.set({
 			...flemsBaseConfig,
-			files,
+			files: toPlainFiles(files),
 			links: links.map((link) => ({ ...link, url: window.location.origin + link.url }))
 		});
 	}
@@ -36,7 +40,7 @@
 		// @ts-ignore
 		flemsInstance = window.Flems(flems, {
 			...flemsBaseConfig,
-			files,
+			files: toPlainFiles(files),
 			links: links.map((link) => ({ ...link, url: window.location.origin + link.url }))
 		});
 		wireOnChange();
