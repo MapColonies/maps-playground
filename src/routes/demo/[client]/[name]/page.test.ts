@@ -11,6 +11,7 @@ interface RenderOpts {
 	envDebounce?: string; // value of PUBLIC_CACHE_DEBOUNCE_MS, or undefined to omit
 	client?: string;
 	name?: string;
+	agentEnabled?: boolean;
 }
 
 interface PageStore {
@@ -34,6 +35,10 @@ async function renderPage(opts: RenderOpts = {}) {
 	vi.doMock('$lib/components/flems.svelte', async () => ({
 		default: (await import('../../../../test/FlemsMock.svelte')).default
 	}));
+	// Stub AgentChat to avoid its onMount model fetch; keeps the collapse control.
+	vi.doMock('$lib/components/agentChat.svelte', async () => ({
+		default: (await import('../../../../test/AgentChatMock.svelte')).default
+	}));
 
 	// Import the mock-state module from the SAME fresh graph the child writes to.
 	const { flemsMockProps } = await import('../../../../test/flemsMockState');
@@ -53,7 +58,7 @@ async function renderPage(opts: RenderOpts = {}) {
 				demoName: name,
 				displayName: '',
 				description: '',
-				agentEnabled: false
+				agentEnabled: opts.agentEnabled ?? false
 			}
 		}
 	});
@@ -77,6 +82,7 @@ describe('+page.svelte', () => {
 		vi.doUnmock('$env/dynamic/public');
 		vi.doUnmock('$app/stores');
 		vi.doUnmock('$lib/components/flems.svelte');
+		vi.doUnmock('$lib/components/agentChat.svelte');
 	});
 
 	it('shows no banner and uses server files when the cache is empty', async () => {
@@ -207,6 +213,20 @@ describe('+page.svelte', () => {
 		await fireEvent.click(screen.getByLabelText('Expand info panel'));
 		expect(screen.getByLabelText('Collapse info panel')).toBeInTheDocument();
 		expect(screen.queryByLabelText('Expand info panel')).toBeNull();
+	});
+
+	it('collapses and re-expands the agent panel', async () => {
+		await renderPage({ agentEnabled: true });
+		const collapse = screen.getByLabelText('Collapse agent panel');
+		expect(screen.queryByLabelText('Expand agent panel')).toBeNull();
+
+		await fireEvent.click(collapse);
+		expect(screen.queryByLabelText('Collapse agent panel')).toBeNull();
+		expect(screen.getByLabelText('Expand agent panel')).toBeInTheDocument();
+
+		await fireEvent.click(screen.getByLabelText('Expand agent panel'));
+		expect(screen.getByLabelText('Collapse agent panel')).toBeInTheDocument();
+		expect(screen.queryByLabelText('Expand agent panel')).toBeNull();
 	});
 
 	it('reloads cache state when the route params change', async () => {
