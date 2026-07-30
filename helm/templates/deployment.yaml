@@ -53,8 +53,6 @@ spec:
           {{- end }}
           imagePullPolicy: {{ .Values.image.imagePullPolicy }}
           env:
-            # - name: SERVER_PORT
-            #   value: {{ .Values.env.targetPort | quote }}
             - name: NODE_OPTIONS
               value: 'no-network-family-autoselection'
             - name: NODE_TLS_REJECT_UNAUTHORIZED
@@ -70,13 +68,13 @@ spec:
             {{- end }}
           ports:
             - name: http
-              containerPort: {{ .Values.env.targetPort }}
+              containerPort: 8080
               protocol: TCP
           livenessProbe:
             initialDelaySeconds: {{ .Values.initialDelaySeconds }}
             httpGet:
               path: /
-              port: {{ .Values.env.targetPort }}
+              port: 8080
           {{- if .Values.resources.enabled }}
           resources:
             {{- toYaml .Values.resources.value | nindent 12 }}

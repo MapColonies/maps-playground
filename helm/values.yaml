@@ -55,10 +55,6 @@ links:
   devPortalHref: 'http://developer-portal'
   puzzleHref: ''
 
-env:
-  port: 8080
-  targetPort: 8080
-
 cache:
   debounceMs: 500
 
