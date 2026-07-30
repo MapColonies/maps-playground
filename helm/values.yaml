@@ -36,12 +36,24 @@ metrics:
 s3:
   url: 'http://localhost:9000'
   bucket: 'temp'
+  region: 'us-east-1'
   # Provide credentials via an existing Secret (must expose AWS_ACCESS_KEY_ID and
   # AWS_SECRET_ACCESS_KEY). Leave empty to have the chart create the Secret from the
   # accessKeyId/secretAccessKey values below.
   existingSecret: ''
   accessKeyId: 'user'
   secretAccessKey: 'password'
+
+items:
+  indexKey: 'index.json'
+  timeout: 600
+  stale: 600
+
+# Public navigation links exposed to the browser.
+links:
+  catalogHref: 'http://catalog'
+  devPortalHref: 'http://developer-portal'
+  puzzleHref: ''
 
 env:
   port: 8080
