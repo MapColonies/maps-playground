@@ -50,12 +50,9 @@ export async function getFile(key: string): Promise<string> {
 	return await cacheInstance.getObject(key);
 }
 
-// Build a reference block covering EVERY example in the playground: a catalog of
-// each example (client, name, description, file list) followed by the deduped
-// source of those files. Fed to the agent so it can draw on the whole playground
-// as reference material while staying focused on the current example.
-// currentFileNames are skipped from the source dump since they already appear in
-// the agent's main file list. Any failure degrades to '' so the agent still runs.
+// Reference block for the agent: a catalog of every example plus the deduped
+// source of their files. currentFileNames are skipped (already in the agent's
+// main file list). Any failure degrades to '' so the agent still runs.
 export async function buildExampleLibrary(currentFileNames: string[] = []): Promise<string> {
 	let index: DemoIndex;
 	try {

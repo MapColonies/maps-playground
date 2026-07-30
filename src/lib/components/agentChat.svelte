@@ -3,9 +3,8 @@
 	import type { File, ChatMessage } from '$lib/types';
 
 	export let files: File[];
-	// Cache keys identifying the example this panel is currently showing. Every
-	// async op captures them at start so a late response is committed to the
-	// example it was asked about, even after the user navigates elsewhere.
+	// Async ops capture these at start, so a late response commits to the example
+	// it was asked about even after the user navigates elsewhere.
 	export let chatCacheKey = '';
 	export let fileCacheKey = '';
 	export let onFilesChange: (files: File[], originKey: string) => void = () => undefined;
@@ -21,23 +20,16 @@
 		{ name: '/compact', desc: 'Summarize the conversation to save context' }
 	];
 
-	// Reflect a message list: notify the parent so it persists to originKey, and
-	// update the visible thread only if the user is still viewing that example.
+	// Persist to the origin example; reflect in the view only if it's still shown.
 	function commitMessages(next: ChatMessage[], originKey: string) {
 		if (originKey === chatCacheKey) messages = next;
 		onMessagesChange(next, originKey);
 	}
 
-	// Stick-to-bottom auto-scroll.
-	//   autoFollow — armed by default; a real user scroll upward releases it and
-	//     scrolling back to the bottom re-arms it, so a user reading history is
-	//     never yanked down while new messages still follow when they're at the end.
-	//   forcePin — a stronger, transient pin for the first render and every example
-	//     switch. Threads are restored from cache scrolled to the top, and swapping
-	//     the message list emits layout-driven scroll events that would otherwise
-	//     flip autoFollow off mid-transition; forcePin ignores those events and
-	//     re-pins on the next frame (after layout/async height settles) so the
-	//     switched-to thread reliably opens at its latest message.
+	// Two-flag stick-to-bottom scroll:
+	//   autoFollow — released when the user scrolls up, re-armed at the bottom.
+	//   forcePin — transient hard pin for first render and example switches, where
+	//     layout-driven scroll events would otherwise flip autoFollow off.
 	let scrollEl: HTMLDivElement;
 	let autoFollow = true;
 	let forcePin = true;
@@ -51,8 +43,7 @@
 		return scrollEl.scrollHeight - scrollEl.scrollTop - scrollEl.clientHeight < 40;
 	}
 	function onThreadScroll() {
-		// Ignore programmatic/layout scrolls during a forced pin; only honour the
-		// user's own scrolling to decide whether to keep following the tail.
+		// During forcePin, ignore layout scrolls — only user scrolling toggles autoFollow.
 		if (scrollEl && !forcePin) autoFollow = atBottom();
 	}
 	afterUpdate(() => {
@@ -68,18 +59,15 @@
 		}
 	});
 
-	// Sending a message and receiving its reply are explicit actions to see the
-	// tail: force the thread to the bottom even if the user had scrolled up.
+	// Explicit actions (send/reply) jump to the tail even if the user scrolled up.
 	function followBottom() {
 		autoFollow = true;
 		forcePin = true;
 	}
 
 	let input = '';
-	// The set of examples with a request in flight. Scoping to the current example
-	// keeps the "Thinking…" indicator and the disabled Send button on the chat that
-	// is actually waiting, so neither bleeds onto other examples during navigation —
-	// and lets different examples run requests concurrently.
+	// Per-example in-flight set: keeps the Thinking indicator and disabled Send on
+	// the waiting chat, and lets examples run requests concurrently.
 	let busyKeys = new Set<string>();
 	$: currentBusy = busyKeys.has(chatCacheKey);
 	function setBusy(key: string, on: boolean) {

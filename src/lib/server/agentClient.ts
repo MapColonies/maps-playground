@@ -133,10 +133,8 @@ function systemPrompt(
 		.join('\n');
 }
 
-// Coerce whatever a provider put in tool_call.function.arguments into a plain
-// JSON object. Accepts a JSON string, an already-parsed object, or garbage;
-// anything that isn't a JSON object (array, empty string, null, invalid JSON)
-// collapses to {}.
+// Coerce provider-supplied tool arguments (JSON string, parsed object, or
+// garbage) into a plain object; non-objects collapse to {}.
 function normalizeToolArgs(raw: string | Record<string, unknown> | undefined): Record<string, unknown> {
 	let value: unknown = raw;
 	if (typeof raw === 'string') {
@@ -193,10 +191,9 @@ export async function runAgent(opts: {
 				opts.portalUrl
 			)
 		};
-		// On the last allowed step, omit the tools entirely so the model is forced
-		// to emit a plain-text answer. tool_choice:'none' is not honored by every
-		// provider (Cohere via LiteLLM ignores it); dropping `tools` is the only
-		// way no provider can return another tool call and leave us the cap stub.
+		// Last step: drop `tools` so the model must answer in plain text.
+		// tool_choice:'none' isn't honored everywhere (Cohere via LiteLLM ignores
+		// it), so omitting tools is the only reliable way to stop another tool call.
 		const isLastStep = i === maxIterations - 1;
 		const res = await doFetch(`${config.baseUrl}/v1/chat/completions`, {
 			method: 'POST',
@@ -216,11 +213,9 @@ export async function runAgent(opts: {
 		if (!choice) throw new Error('llm response missing message');
 
 		const toolCalls = choice.tool_calls ?? [];
-		// Canonicalize every tool call's arguments to a stringified JSON object.
-		// Providers (e.g. Cohere via LiteLLM) reject the echoed assistant turn with
-		// "arguments must be a stringified JSON object" when arguments arrive as a
-		// parsed object, an empty string, an array, or otherwise non-object JSON.
-		// This single pass fixes both the replay and what we hand to applyTool.
+		// Stringify each tool call's arguments: some providers (Cohere via LiteLLM)
+		// reject the echoed turn unless arguments is a stringified JSON object. Same
+		// pass produces the parsed args handed to applyTool.
 		const parsedArgs = toolCalls.map((call) => {
 			const args = normalizeToolArgs(call.function.arguments);
 			call.function.arguments = JSON.stringify(args);
@@ -262,8 +257,7 @@ export async function fetchModels(config: {
 	return (data.data ?? []).map((m: { id: string }) => m.id);
 }
 
-// Collapse a chat history into a short summary. No tools are offered, so this
-// call can never edit files — it only reads the conversation and returns text.
+// Summarize a chat history. No tools offered, so it can't edit files.
 export async function summarizeConversation(opts: {
 	messages: ChatMessage[];
 	config: AgentConfig;

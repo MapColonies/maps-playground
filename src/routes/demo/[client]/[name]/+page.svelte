@@ -29,7 +29,7 @@
 	let mounted = false;
 	let loadedKey = '';
 
-	// Recompute the cache keys reactively so navigation reloads the right demo instead of keeping stale files/chat.
+	// Reactive keys so navigation reloads the right demo instead of stale files/chat.
 	$: key = cacheKey($page.params.client, $page.params.name);
 	$: chatK = chatKey($page.params.client, $page.params.name);
 
@@ -67,14 +67,12 @@
 		if (saveTimer) clearTimeout(saveTimer);
 		saveTimer = setTimeout(() => {
 			saveCache(savingKey, edited);
-			// Reflect the freshly-written cache in the banner, but only if the user is
-			// still viewing the example we just saved (they may have navigated away).
+			// Show the cache banner only if still viewing the example we just saved.
 			if (savingKey === key) fromCache = true;
 		}, debounceMs);
 	}
 
-	// Agent edits are bound to the example they were issued from (originKey), so a
-	// late response persists to that example even after the user navigated away.
+	// Agent edits persist to their origin example even after the user navigated away.
 	function handleAgentFiles(next: File[], originKey: string) {
 		if (saveTimer) clearTimeout(saveTimer);
 		saveCache(originKey, next);
@@ -84,15 +82,14 @@
 		}
 	}
 
-	// Persist chat immediately — messages are discrete events, not rapid keystrokes.
-	// Persist to the originating example; only reflect it if still viewing that one.
+	// Persist chat immediately (discrete events, not keystrokes) to its origin
+	// example; reflect only if still viewing it.
 	function handleChatChange(next: ChatMessage[], originKey: string) {
 		saveChat(originKey, next);
 		if (originKey === chatK) {
 			chat = next;
 		} else if (next.at(-1)?.role === 'assistant') {
-			// A reply landed for an example we've since navigated away from — flag it
-			// so the bottom nav shows an unread dot on that example's tab.
+			// Reply for an example we navigated away from — flag its unread dot.
 			markUnread(originKey);
 		}
 	}

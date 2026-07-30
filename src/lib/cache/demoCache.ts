@@ -15,8 +15,8 @@ export function chatKey(client: string, name: string): string {
 	return `${CHAT_NAMESPACE}:${client}/${name}`;
 }
 
-// Prefix shared by every chatKey of a client — lets callers test whether any of a
-// client's examples matches without enumerating the client's item list.
+// Shared prefix of a client's chatKeys — lets callers match any example without
+// enumerating the client's items.
 export function chatKeyPrefix(client: string): string {
 	return `${CHAT_NAMESPACE}:${client}/`;
 }

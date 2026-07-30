@@ -19,14 +19,12 @@
 
 	$: activeItem = $page.params.name;
 
-	// An example tab shows an unread dot when the agent replied to its chat while
-	// the user was viewing a different example.
+	// Unread dot when the agent replied to this example while the user was elsewhere.
 	$: isItemUnread = (name: string) =>
 		activeClient !== undefined && $unreadChats.has(chatKey(activeClient, name));
 
-	// A client-header tab shows a dot when any of its examples is unread. This is
-	// how off-screen replies on a non-active client surface, since only the active
-	// client's example tabs are rendered.
+	// Client-header dot when any of its examples is unread — how replies on a
+	// non-active client surface, since only the active client's tabs are rendered.
 	$: isClientUnread = (client: string) => {
 		const prefix = chatKeyPrefix(client);
 		for (const k of $unreadChats) if (k.startsWith(prefix)) return true;

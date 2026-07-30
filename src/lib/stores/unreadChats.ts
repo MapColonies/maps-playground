@@ -1,8 +1,7 @@
 import { writable } from 'svelte/store';
 
-// Keys (chat cache keys) of examples whose agent produced a reply while the user
-// was viewing a different example. Drives the "unread" dot in the bottom nav so a
-// late, off-screen response is discoverable. Cleared when that example is viewed.
+// Chat keys of examples whose agent replied while the user was elsewhere. Drives
+// the unread dot in the bottom nav; cleared when the example is viewed.
 export const unreadChats = writable<Set<string>>(new Set());
 
 // Always reassign a fresh Set — Svelte's store equality is by reference, so
