@@ -29,6 +29,10 @@
 	let mounted = false;
 	let loadedKey = '';
 
+	// Collapse the side panels to give the map/editor more room.
+	let agentCollapsed = false;
+	let infoCollapsed = false;
+
 	// Reactive keys so navigation reloads the right demo instead of stale files/chat.
 	$: key = cacheKey($page.params.client, $page.params.name);
 	$: chatK = chatKey($page.params.client, $page.params.name);
@@ -124,43 +128,89 @@
 
 	<div class="flex-1 min-h-0 flex flex-row gap-3 p-3 bg-gray-50 dark:bg-gray-900">
 		{#if data.agentEnabled}
-			<aside
-				class="w-96 shrink-0 flex flex-col rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800"
-			>
-				<AgentChat
-					{files}
-					chatCacheKey={chatK}
-					fileCacheKey={key}
-					onFilesChange={handleAgentFiles}
-					messages={chat}
-					onMessagesChange={handleChatChange}
-					demoName={data.displayName || data.demoName}
-					description={data.description}
-				/>
-			</aside>
+			{#if agentCollapsed}
+				<aside
+					class="w-10 shrink-0 flex flex-col items-center py-3 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800"
+				>
+					<button
+						type="button"
+						aria-label="Expand agent panel"
+						title="Expand agent panel"
+						on:click={() => (agentCollapsed = false)}
+						class="flex flex-col items-center gap-2 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+					>
+						<span aria-hidden="true">»</span>
+						<span class="[writing-mode:vertical-rl] text-xs font-medium tracking-wide">Agent</span>
+					</button>
+				</aside>
+			{:else}
+				<aside
+					class="w-96 shrink-0 flex flex-col rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800"
+				>
+					<AgentChat
+						{files}
+						chatCacheKey={chatK}
+						fileCacheKey={key}
+						onFilesChange={handleAgentFiles}
+						messages={chat}
+						onMessagesChange={handleChatChange}
+						demoName={data.displayName || data.demoName}
+						description={data.description}
+						onCollapse={() => (agentCollapsed = true)}
+					/>
+				</aside>
+			{/if}
 		{/if}
 		<div
 			class="flex-1 min-w-0 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800"
 		>
 			<Flems {files} links={data.links} onChange={handleChange} />
 		</div>
-		<aside
-			class="w-80 shrink-0 flex flex-col rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800"
-		>
-			<header class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-					{data.displayName || data.demoName}
-				</h2>
-			</header>
-			<div class="flex-1 overflow-y-auto px-4 py-3">
-				{#if data.description}
-					<p class="text-sm leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-line">
-						{data.description}
-					</p>
-				{:else}
-					<p class="text-sm italic text-gray-400 dark:text-gray-500">No description provided.</p>
-				{/if}
-			</div>
-		</aside>
+		{#if infoCollapsed}
+			<aside
+				class="w-10 shrink-0 flex flex-col items-center py-3 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800"
+			>
+				<button
+					type="button"
+					aria-label="Expand info panel"
+					title="Expand info panel"
+					on:click={() => (infoCollapsed = false)}
+					class="flex flex-col items-center gap-2 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+				>
+					<span aria-hidden="true">«</span>
+					<span class="[writing-mode:vertical-rl] text-xs font-medium tracking-wide">Info</span>
+				</button>
+			</aside>
+		{:else}
+			<aside
+				class="w-80 shrink-0 flex flex-col rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800"
+			>
+				<header
+					class="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-200 dark:border-gray-700"
+				>
+					<h2 class="min-w-0 truncate text-lg font-semibold text-gray-900 dark:text-white">
+						{data.displayName || data.demoName}
+					</h2>
+					<button
+						type="button"
+						aria-label="Collapse info panel"
+						title="Collapse info panel"
+						on:click={() => (infoCollapsed = true)}
+						class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+					>
+						<span aria-hidden="true">»</span>
+					</button>
+				</header>
+				<div class="flex-1 overflow-y-auto px-4 py-3">
+					{#if data.description}
+						<p class="text-sm leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-line">
+							{data.description}
+						</p>
+					{:else}
+						<p class="text-sm italic text-gray-400 dark:text-gray-500">No description provided.</p>
+					{/if}
+				</div>
+			</aside>
+		{/if}
 	</div>
 </div>
