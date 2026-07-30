@@ -266,6 +266,37 @@ describe('agentChat.svelte', () => {
 		);
 	});
 
+	it('renders assistant markdown as HTML and keeps user text plain', async () => {
+		vi.stubGlobal('fetch', mockFetch({ reply: 'x', files }));
+		const { getByText, container } = render(AgentChat, {
+			props: {
+				files,
+				onFilesChange: vi.fn(),
+				messages: [
+					{ role: 'user' as const, content: 'make it **bold**' },
+					{
+						role: 'assistant' as const,
+						content: 'sure: **done**\n```js\nconst z = 4;\n```'
+					}
+				],
+				chatCacheKey: 'chat:A'
+			}
+		});
+		await waitFor(() => expect(getByText('gpt-4o')).toBeInTheDocument());
+
+		// Assistant markdown becomes real HTML elements.
+		expect(container.querySelector('.chat-md strong')?.textContent).toBe('done');
+
+		// Fenced code renders as pre/code and gets syntax-highlighted by highlight.js.
+		const codeEl = container.querySelector('.chat-md pre code');
+		expect(codeEl?.textContent).toContain('const z = 4;');
+		await waitFor(() => expect(codeEl?.querySelector('.hljs-keyword')).not.toBeNull());
+
+		// User asterisks are shown literally, not rendered.
+		expect(getByText(/make it \*\*bold\*\*/)).toBeInTheDocument();
+		expect(container.querySelector('.chat-md strong')?.textContent).not.toBe('bold');
+	});
+
 	it('the header info summary appears on hover', async () => {
 		vi.stubGlobal('fetch', mockFetch({ reply: 'x', files }));
 		const { getByText, getByLabelText, queryByText, findByText } = render(AgentChat, {

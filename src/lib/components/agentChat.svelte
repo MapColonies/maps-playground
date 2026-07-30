@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount, afterUpdate } from 'svelte';
 	import type { File, ChatMessage } from '$lib/types';
+	import { renderMarkdown } from '$lib/markdown';
+	import { highlightWithin } from '$lib/highlight';
 
 	export let files: File[];
 	// Async ops capture these at start, so a late response commits to the example
@@ -49,6 +51,7 @@
 		if (scrollEl && !forcePin) autoFollow = atBottom();
 	}
 	afterUpdate(() => {
+		if (scrollEl) highlightWithin(scrollEl);
 		if (!scrollEl || !(forcePin || autoFollow)) return;
 		scrollEl.scrollTop = scrollEl.scrollHeight;
 		if (typeof requestAnimationFrame !== 'undefined') {
@@ -298,14 +301,21 @@
 		class="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3"
 	>
 		{#each messages as m}
-			<div
-				class="text-sm {m.role === 'user'
-					? 'text-gray-900 dark:text-white'
-					: 'text-blue-700 dark:text-blue-300'}"
-			>
-				<span class="font-medium">{m.role === 'user' ? 'You' : 'Agent'}:</span>
-				<span class="whitespace-pre-wrap">{m.content}</span>
-			</div>
+			{#if m.role === 'user'}
+				<div class="text-sm text-gray-900 dark:text-white">
+					<span class="font-medium">You:</span>
+					<span class="whitespace-pre-wrap">{m.content}</span>
+				</div>
+			{:else}
+				<div class="text-sm">
+					<span class="font-medium text-blue-700 dark:text-blue-300">Agent:</span>
+					<!-- Model output is untrusted; renderMarkdown sanitizes (DOMPurify) before {@html}. -->
+					<div class="chat-md mt-1 text-gray-900 dark:text-gray-100">
+						<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+						{@html renderMarkdown(m.content)}
+					</div>
+				</div>
+			{/if}
 		{/each}
 		{#if currentBusy}
 			<div class="text-sm italic text-gray-400">Thinking…</div>
