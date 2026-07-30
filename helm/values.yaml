@@ -2,7 +2,7 @@ global:
   cloudProvider: {}
   environment: {}
 enabled: true
-environment: production
+environment: development
 replicaCount: 1
 initialDelaySeconds: 60
 nodePort: 30030
