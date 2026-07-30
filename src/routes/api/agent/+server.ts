@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import { runAgent } from '$lib/server/agentClient';
+import { buildExampleLibrary } from '$lib/server/demoManager';
 import { assertAgentAccess } from '$lib/server/agentGuard';
 
 export async function POST({ request, url }) {
@@ -17,11 +18,18 @@ export async function POST({ request, url }) {
 	}
 
 	try {
+		// Feed the agent every other example as reference, deduped against the
+		// current example's own files (already sent in `files`).
+		const exampleLibrary = await buildExampleLibrary(
+			files.map((f: { name: string }) => f.name)
+		);
 		const result = await runAgent({
 			files,
 			messages,
 			demoName,
 			description,
+			exampleLibrary,
+			portalUrl: env.DEVELOPER_PORTAL_URL,
 			config: {
 				baseUrl: LITELLM_BASE_URL,
 				apiKey: LITELLM_API_KEY,

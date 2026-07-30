@@ -93,7 +93,13 @@ interface LlmMessage {
 	tool_call_id?: string;
 }
 
-function systemPrompt(files: File[], demoName?: string, description?: string): string {
+function systemPrompt(
+	files: File[],
+	demoName?: string,
+	description?: string,
+	exampleLibrary?: string,
+	portalUrl?: string
+): string {
 	const contents = files
 		.map((f) => `--- ${f.name} ---\n${f.content}`)
 		.join('\n\n');
@@ -104,6 +110,9 @@ function systemPrompt(files: File[], demoName?: string, description?: string): s
 		'Each example is a minimal snippet that runs in an in-browser Flems playground — it is teaching material, not a production application.',
 		'Scope every suggestion to that purpose: correctness of the mapping technique, clarity, and idiomatic library/MapColonies usage.',
 		'Do NOT suggest production-app concerns that do not apply to a sandbox snippet — no build tooling, test frameworks, TypeScript migration, CI, package managers, or deployment/security hardening — unless the user explicitly asks.',
+		portalUrl
+			? `The MapColonies developer portal (${portalUrl}) is the authoritative reference for our services' APIs, endpoints, parameters, and auth. Treat it as the source of truth, point users there for details, and do not invent API specifics that would contradict it.`
+			: '',
 		demoName ? `Demo: ${demoName}` : '',
 		description ? `Description: ${description}` : '',
 		'The full current contents of every file are given below. This is the ONLY source of truth about the code —',
@@ -113,7 +122,12 @@ function systemPrompt(files: File[], demoName?: string, description?: string): s
 		'Current files:',
 		contents,
 		'Only call write_file or edit_file when the user explicitly asks you to change the code. For questions, reviews, or discussion, reply in plain text and do NOT call any tool. Prefer edit_file over rewriting a whole file, keep edits minimal, preserve the existing imports and structure, and explain what you changed.',
-		'Keep your chat replies short and to the point: a few sentences or a short bullet list. Lead with the answer, skip preamble and restating the question, and do not dump full-file rewrites or long multi-section plans in chat. This brevity rule applies ONLY to your prose — never trade away correctness, needed detail, or completeness in the actual code you write.'
+		'Write minimal, idiomatic code that follows the mapping library and MapColonies best practices — no dead code, no needless abstraction. Add a short comment above each logical section of the code explaining what that section does, so the example reads as teaching material.',
+		'Keep your chat replies short and to the point: a few sentences or a short bullet list. Lead with the answer, skip preamble and restating the question, and do not dump full-file rewrites or long multi-section plans in chat. This brevity rule applies ONLY to your prose — never trade away correctness, needed detail, or completeness in the actual code you write.',
+		exampleLibrary
+			? 'REFERENCE MATERIAL follows: every other example in the playground. Your focus stays the CURRENT example above — never edit, migrate, or drift onto these other examples. Use them only as a trusted source of correct patterns, idioms, and MapColonies wiring to give better answers and code for the current example.'
+			: '',
+		exampleLibrary || ''
 	]
 		.filter(Boolean)
 		.join('\n');
@@ -142,6 +156,8 @@ export async function runAgent(opts: {
 	config: AgentConfig;
 	demoName?: string;
 	description?: string;
+	exampleLibrary?: string;
+	portalUrl?: string;
 }): Promise<{ reply: string; files: File[] }> {
 	const { config } = opts;
 	const doFetch = config.fetchFn ?? fetch;
@@ -149,7 +165,16 @@ export async function runAgent(opts: {
 	let files = opts.files;
 
 	const convo: LlmMessage[] = [
-		{ role: 'system', content: systemPrompt(files, opts.demoName, opts.description) },
+		{
+			role: 'system',
+			content: systemPrompt(
+				files,
+				opts.demoName,
+				opts.description,
+				opts.exampleLibrary,
+				opts.portalUrl
+			)
+		},
 		...opts.messages.map((m) => ({ role: m.role, content: m.content }))
 	];
 	// Everything appended from here on belongs to THIS run; the fallback below
@@ -158,7 +183,16 @@ export async function runAgent(opts: {
 
 	for (let i = 0; i < maxIterations; i++) {
 		// Rebuild the system prompt so its file list reflects edits applied so far.
-		convo[0] = { role: 'system', content: systemPrompt(files, opts.demoName, opts.description) };
+		convo[0] = {
+			role: 'system',
+			content: systemPrompt(
+				files,
+				opts.demoName,
+				opts.description,
+				opts.exampleLibrary,
+				opts.portalUrl
+			)
+		};
 		// On the last allowed step, omit the tools entirely so the model is forced
 		// to emit a plain-text answer. tool_choice:'none' is not honored by every
 		// provider (Cohere via LiteLLM ignores it); dropping `tools` is the only
