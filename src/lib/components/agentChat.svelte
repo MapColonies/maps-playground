@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, afterUpdate } from 'svelte';
 	import type { File, ChatMessage } from '$lib/types';
 
 	export let files: File[];
@@ -26,6 +26,53 @@
 	function commitMessages(next: ChatMessage[], originKey: string) {
 		if (originKey === chatCacheKey) messages = next;
 		onMessagesChange(next, originKey);
+	}
+
+	// Stick-to-bottom auto-scroll.
+	//   autoFollow — armed by default; a real user scroll upward releases it and
+	//     scrolling back to the bottom re-arms it, so a user reading history is
+	//     never yanked down while new messages still follow when they're at the end.
+	//   forcePin — a stronger, transient pin for the first render and every example
+	//     switch. Threads are restored from cache scrolled to the top, and swapping
+	//     the message list emits layout-driven scroll events that would otherwise
+	//     flip autoFollow off mid-transition; forcePin ignores those events and
+	//     re-pins on the next frame (after layout/async height settles) so the
+	//     switched-to thread reliably opens at its latest message.
+	let scrollEl: HTMLDivElement;
+	let autoFollow = true;
+	let forcePin = true;
+	let shownKey = chatCacheKey;
+	$: if (chatCacheKey !== shownKey) {
+		shownKey = chatCacheKey;
+		forcePin = true;
+		autoFollow = true;
+	}
+	function atBottom() {
+		return scrollEl.scrollHeight - scrollEl.scrollTop - scrollEl.clientHeight < 40;
+	}
+	function onThreadScroll() {
+		// Ignore programmatic/layout scrolls during a forced pin; only honour the
+		// user's own scrolling to decide whether to keep following the tail.
+		if (scrollEl && !forcePin) autoFollow = atBottom();
+	}
+	afterUpdate(() => {
+		if (!scrollEl || !(forcePin || autoFollow)) return;
+		scrollEl.scrollTop = scrollEl.scrollHeight;
+		if (typeof requestAnimationFrame !== 'undefined') {
+			requestAnimationFrame(() => {
+				if (scrollEl && (forcePin || autoFollow)) scrollEl.scrollTop = scrollEl.scrollHeight;
+				forcePin = false;
+			});
+		} else {
+			forcePin = false;
+		}
+	});
+
+	// Sending a message and receiving its reply are explicit actions to see the
+	// tail: force the thread to the bottom even if the user had scrolled up.
+	function followBottom() {
+		autoFollow = true;
+		forcePin = true;
 	}
 
 	let input = '';
@@ -105,6 +152,7 @@
 			const data = (await res.json()) as { summary: string };
 			const summary = (data.summary ?? '').trim();
 			if (summary) {
+				if (originKey === chatCacheKey) followBottom();
 				commitMessages(
 					[{ role: 'assistant', content: `Summary of earlier conversation:\n${summary}` }],
 					originKey
@@ -131,6 +179,7 @@
 		const originFiles = files;
 		error = '';
 		const outgoing: ChatMessage[] = [...messages, { role: 'user', content: text }];
+		followBottom();
 		commitMessages(outgoing, originChat);
 		clearInputState();
 		setBusy(originChat, true);
@@ -150,6 +199,7 @@
 			const data = (await res.json()) as { reply: string; files: File[] };
 			const filesChanged = JSON.stringify(data.files) !== JSON.stringify(originFiles);
 			const reply = data.reply?.trim() || (filesChanged ? '(updated the files)' : '(no response)');
+			if (originChat === chatCacheKey) followBottom();
 			commitMessages([...outgoing, { role: 'assistant', content: reply }], originChat);
 			if (filesChanged) {
 				onFilesChange(data.files, originFile);
@@ -239,7 +289,11 @@
 		</select>
 	</header>
 
-	<div class="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
+	<div
+		bind:this={scrollEl}
+		on:scroll={onThreadScroll}
+		class="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3"
+	>
 		{#each messages as m}
 			<div
 				class="text-sm {m.role === 'user'
