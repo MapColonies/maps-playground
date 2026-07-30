@@ -8,8 +8,6 @@ data:
   # NODE_TLS_REJECT_UNAUTHORIZED: '0'
   AWS_ENDPOINT_URL: {{ .Values.s3.url }}
   AWS_BUCKET: {{ .Values.s3.bucket }}
-  AWS_ACCESS_KEY_ID: {{ .Values.s3.accessKeyId }}
-  AWS_SECRET_ACCESS_KEY: {{ .Values.s3.secretAccessKey }}
   AWS_REGION: us-east-1
   INDEX_KEY: index.json
   ITEMS_TIMEOUT: '600'
@@ -18,6 +16,13 @@ data:
   PUBLIC_DEVPORTAL_HREF: 'http://developer-portal'
   PUBLIC_PUZZLE_HREF: ''
   PUBLIC_CACHE_DEBOUNCE_MS: {{ .Values.cache.debounceMs | quote }}
+  AGENT_ENABLED: {{ .Values.agent.enabled | quote }}
+  LITELLM_BASE_URL: {{ .Values.agent.litellm.baseUrl | quote }}
+  AGENT_MODEL: {{ .Values.agent.model | quote }}
+  DEVELOPER_PORTAL_URL: {{ .Values.agent.developerPortalUrl | quote }}
+  {{- with .Values.agent.allowedOrigin }}
+  AGENT_ALLOWED_ORIGIN: {{ . | quote }}
+  {{- end }}
   npm_config_cache: /tmp/
   # default.conf: {{ tpl (.Files.Get "config/default.conf") . | quote }}
 {{- end }}

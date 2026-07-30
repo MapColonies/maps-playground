@@ -36,6 +36,10 @@ metrics:
 s3:
   url: 'http://localhost:9000'
   bucket: 'temp'
+  # Provide credentials via an existing Secret (must expose AWS_ACCESS_KEY_ID and
+  # AWS_SECRET_ACCESS_KEY). Leave empty to have the chart create the Secret from the
+  # accessKeyId/secretAccessKey values below.
+  existingSecret: ''
   accessKeyId: 'user'
   secretAccessKey: 'password'
 
@@ -45,6 +49,20 @@ env:
 
 cache:
   debounceMs: 500
+
+# Agent chat panel (LiteLLM-backed). Dark unless enabled=true.
+agent:
+  enabled: false
+  model: inclusionai/ling-3.0-flash:free
+  developerPortalUrl: 'http://developer-portal'
+  # Optional: expected browser Origin for /api/agent behind a proxy. Empty = app origin.
+  allowedOrigin: ''
+  litellm:
+    baseUrl: 'http://litellm:4000'
+    # Provide the key via an existing Secret (must expose LITELLM_API_KEY). Leave empty
+    # to have the chart create the Secret from apiKey below.
+    existingSecret: ''
+    apiKey: ''
 
 resources:
   enabled: true
