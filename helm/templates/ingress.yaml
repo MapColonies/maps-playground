@@ -30,6 +30,6 @@ spec:
           service:
             name: {{ $releaseName }}-{{ $chartName }}
             port:
-              number: {{ .Values.env.port }}
+              number: 8080
     host: {{ .Values.ingress.host | quote }}
 {{- end -}}

@@ -102,6 +102,20 @@ Returns the cloud provider image pull secret name from global if exists or from 
 {{- end -}}
 
 {{/*
+Name of the Secret holding AWS credentials: the external one if provided, else the chart-created one.
+*/}}
+{{- define "developer-portal.s3SecretName" -}}
+{{- .Values.s3.existingSecret | default (printf "%s-%s-s3-secret" .Release.Name (include "developer-portal.name" .)) -}}
+{{- end -}}
+
+{{/*
+Name of the Secret holding the LiteLLM API key: the external one if provided, else the chart-created one.
+*/}}
+{{- define "developer-portal.agentSecretName" -}}
+{{- .Values.agent.litellm.existingSecret | default (printf "%s-%s-agent-secret" .Release.Name (include "developer-portal.name" .)) -}}
+{{- end -}}
+
+{{/*
 Returns string array of namespace values (if we'll need to implement it)
 */}}
 {{- define "developer-portal.getNSArray" -}}
