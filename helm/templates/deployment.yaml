@@ -57,7 +57,7 @@ spec:
               value: 'no-network-family-autoselection'
             {{- if .Values.global.ca.secretName }}
             - name: NODE_EXTRA_CA_CERTS
-              value: {{ printf "%s/%s" .Values.global.ca.path .Values.global.ca.key | quote }}
+              value: '/usr/local/share/ca-certificates/ca.crt'
             {{- end }}
           envFrom:
             - configMapRef:
@@ -94,8 +94,8 @@ spec:
           {{- if .Values.global.ca.secretName }}
           volumeMounts:
             - name: root-ca
-              mountPath: {{ printf "%s/%s" .Values.global.ca.path .Values.global.ca.key | quote }}
-              subPath: {{ .Values.global.ca.key | quote }}
+              mountPath: '/usr/local/share/ca-certificates/ca.crt'
+              subPath: 'ca.crt'
           {{- end }}
       {{- if .Values.global.ca.secretName }}
       volumes:
