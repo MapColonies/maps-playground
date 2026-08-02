@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/MapColonies/maps-playground/compare/v1.3.0...v1.4.0) (2026-08-02)
+
+
+### Features
+
+* **helm:** wire agent chat env + move credentials to Secret ([#30](https://github.com/MapColonies/maps-playground/issues/30)) ([1964994](https://github.com/MapColonies/maps-playground/commit/1964994ed414e706684488979c25a58343818e10))
+
 ## [1.3.0](https://github.com/MapColonies/maps-playground/compare/v1.2.0...v1.3.0) (2026-07-30)
 
 
