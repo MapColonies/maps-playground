@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/MapColonies/maps-playground/compare/v1.4.0...v1.5.0) (2026-08-02)
+
+
+### Features
+
+* **helm:** readiness rootca cleanup ([#32](https://github.com/MapColonies/maps-playground/issues/32)) ([a759412](https://github.com/MapColonies/maps-playground/commit/a759412907020c40ff617c17ad51722beb212c72))
+
 ## [1.4.0](https://github.com/MapColonies/maps-playground/compare/v1.3.0...v1.4.0) (2026-08-02)
 
 
