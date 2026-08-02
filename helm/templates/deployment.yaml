@@ -72,8 +72,14 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-          livenessProbe:
+          startupProbe:
             initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            httpGet:
+              path: /
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 30
+          livenessProbe:
             httpGet:
               path: /
               port: 8080
