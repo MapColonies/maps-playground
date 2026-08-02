@@ -5,7 +5,6 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-{{ $chartName }}-configmap
 data:
-  # NODE_TLS_REJECT_UNAUTHORIZED: '0'
   AWS_ENDPOINT_URL: {{ .Values.s3.url | quote }}
   AWS_BUCKET: {{ .Values.s3.bucket | quote }}
   AWS_REGION: {{ .Values.s3.region | quote }}
@@ -24,5 +23,4 @@ data:
   AGENT_ALLOWED_ORIGIN: {{ . | quote }}
   {{- end }}
   npm_config_cache: /tmp/
-  # default.conf: {{ tpl (.Files.Get "config/default.conf") . | quote }}
 {{- end }}
