@@ -1,6 +1,14 @@
 global:
   cloudProvider: {}
   environment: {}
+  # Root CA injected into the pod for outbound TLS to internal (self-signed)
+  # endpoints. References a pre-existing Secret (not created by this chart);
+  # its `key` is mounted at `path` and exported via NODE_EXTRA_CA_CERTS.
+  # Set secretName to '' to disable injection.
+  ca:
+    secretName: 'root-ca'
+    path: '/usr/local/share/ca-certificates'
+    key: 'ca.crt'
 enabled: true
 environment: development
 replicaCount: 1
