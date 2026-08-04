@@ -24,6 +24,7 @@ mclabels:
   owner: common
   partOf: maps-playground
   component: frontend
+  criticality: internal
   prometheus:
     enabled: true
     port: 8080
