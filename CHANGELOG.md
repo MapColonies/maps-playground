@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/MapColonies/maps-playground/compare/v1.5.0...v1.5.1) (2026-08-05)
+
+
+### Bug Fixes
+
+* **helm:** derive image tag from chart appVersion ([#35](https://github.com/MapColonies/maps-playground/issues/35)) ([199a401](https://github.com/MapColonies/maps-playground/commit/199a4018ef2aa753d32e6e429e7473ba534f9925))
+
 ## [1.5.0](https://github.com/MapColonies/maps-playground/compare/v1.4.0...v1.5.0) (2026-08-02)
 
 
