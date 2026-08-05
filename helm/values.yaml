@@ -16,7 +16,6 @@ cloudProvider:
 
 image:
   repository: localhost/mapcolonies/common/maps-playground
-  tag: 0.0.1-4
   imagePullPolicy: IfNotPresent
 
 mclabels:
