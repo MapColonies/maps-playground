@@ -191,6 +191,30 @@
 				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
 				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
 			]
+		},
+		"TerrainRGB": {
+			"displayName": "TerrainRGB Elevation",
+			"description": "Draws a MapColonies TerrainRGB layer as a coloured elevation map and shows the height under the mouse. Each tile pixel encodes a height in its red, green and blue values, decoded in the browser with a WebGL style expression.\n\nUse it to check what a TerrainRGB layer covers, or as the starting point for any 2D analysis that needs heights in the client.",
+			"files": [
+				"openlayers-terrainrgb/terrainrgb.js",
+				"config/common-config.js",
+				"config/dem-config.js",
+				"utils/terrainrgb-utils.js",
+				"openlayers-terrainrgb/terrainrgb.css",
+				"openlayers-terrainrgb/terrainrgb.html"
+			],
+			"links": [
+				{
+					"name": "ol.css",
+					"url": "/libs/ol/v7.3.0/ol.css",
+					"type": "css"
+				},
+				{
+					"name": "ol.js",
+					"url": "/libs/ol/v7.3.0/ol.js",
+					"type": "js"
+				}
+			]
 		}
 	},
 	"Cesium": {
@@ -351,6 +375,33 @@
 					"type": "css"
 				}
 			]
+		},
+		"TerrainRGB": {
+			"displayName": "TerrainRGB Terrain",
+			"description": "Uses a MapColonies TerrainRGB layer as the Cesium globe's elevation, under the same imagery as the Terrain Provider example. The tiles are decoded in the browser and handed to Cesium as heightmaps.\n\nShows how to drive 3D terrain from plain image tiles, without a quantized-mesh terrain service.",
+			"files": [
+				"cesium-terrainrgb/cesium.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/wmts-utils.js",
+				"utils/xml-utils.js",
+				"config/dem-config.js",
+				"utils/terrainrgb-utils.js",
+				"cesium-terrainrgb/cesium.html"
+			],
+			"links": [
+				{
+					"name": "cesium.js",
+					"url": "/libs/Cesium/Cesium.js",
+					"type": "js"
+				},
+				{
+					"name": "widgets.css",
+					"url": "/libs/Cesium/Widgets/widgets.css",
+					"type": "css"
+				}
+			]
 		}
 	},
 	"Leaflet": {
@@ -366,6 +417,30 @@
 				"utils/xml-utils.js",
 				"leaflet-wmts/leaflet.css",
 				"leaflet-wmts/leaflet.html"
+			],
+			"links": [
+				{
+					"name": "leaflet.js",
+					"url": "/libs/leaflet/1.9.4/leaflet.js",
+					"type": "js"
+				},
+				{
+					"name": "leaflet.css",
+					"url": "/libs/leaflet/1.9.4/leaflet.css",
+					"type": "css"
+				}
+			]
+		},
+		"TerrainRGB": {
+			"displayName": "TerrainRGB Elevation",
+			"description": "Draws a MapColonies TerrainRGB layer in Leaflet as a coloured elevation map and shows the height under the mouse. A canvas grid layer fetches each tile, decodes its heights and colours them.\n\nA lightweight way to read heights in a 2D client without WebGL.",
+			"files": [
+				"leaflet-terrainrgb/terrainrgb.js",
+				"config/common-config.js",
+				"config/dem-config.js",
+				"utils/terrainrgb-utils.js",
+				"leaflet-terrainrgb/terrainrgb.css",
+				"leaflet-terrainrgb/terrainrgb.html"
 			],
 			"links": [
 				{
