@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.6.0](https://github.com/MapColonies/maps-playground/compare/v1.5.0...v1.6.0) (2026-11-17)
+
+
+### Features
+
+* **examples:** add MapLibre viewer (WorldCRS84 fork) ([#44](https://github.com/MapColonies/maps-playground/issues/44)) ([0674a10](https://github.com/MapColonies/maps-playground/commit/0674a104c172f42956b51ad77439e524a48a31b3))
+* **examples:** add TerrainRGB examples for Cesium, OpenLayers, Leaflet and MapLibre ([#43](https://github.com/MapColonies/maps-playground/issues/43)) ([fd2f641](https://github.com/MapColonies/maps-playground/commit/fd2f6413d47a78d39e43c46ab9c3a987251a5290))
+
+
+### Bug Fixes
+
+* **examples:** commit only placeholders for environment config values ([#45](https://github.com/MapColonies/maps-playground/issues/45)) ([f9f667f](https://github.com/MapColonies/maps-playground/commit/f9f667f11bb31dbb631e60e56f0fc3ae1f4ddfd4))
+* **helm:** derive image tag from chart appVersion ([#35](https://github.com/MapColonies/maps-playground/issues/35)) ([199a401](https://github.com/MapColonies/maps-playground/commit/199a4018ef2aa753d32e6e429e7473ba534f9925))
+
 ## [1.5.0](https://github.com/MapColonies/maps-playground/compare/v1.4.0...v1.5.0) (2026-08-02)
 
 
