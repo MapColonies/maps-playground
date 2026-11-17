@@ -1,0 +1,12 @@
+{{- if and .Values.enabled .Values.metrics.grafanaDashboard.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-{{ include "developer-portal.name" . }}-grafana-dashboard
+  labels:
+    {{ .Values.metrics.grafanaDashboard.label }}: {{ .Values.metrics.grafanaDashboard.value | quote }}
+    {{- include "developer-portal.labels" . | nindent 4 }}
+data:
+  maps-playground-dashboard.json: |-
+    {{- .Files.Get "grafana/maps-playground-dashboard.json" | nindent 4 }}
+{{- end }}

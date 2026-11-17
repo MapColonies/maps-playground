@@ -1,4 +1,7 @@
+import { error } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 import { getDemoIndex, getFile } from '$lib/server/demoManager.js';
+import { demoViewsTotal } from '$lib/server/metrics';
 import type { Link, File } from '$lib/types';
 
 export async function entries(): Promise<Array<{ client: string; name: string }>> {
@@ -12,12 +15,22 @@ export async function entries(): Promise<Array<{ client: string; name: string }>
 	return out;
 }
 
-export async function load({
-	params
-}): Promise<{ links: Link[]; files: File[]; demoName: string }> {
+export async function load({ params }): Promise<{
+	links: Link[];
+	files: File[];
+	demoName: string;
+	displayName?: string;
+	description?: string;
+	agentEnabled: boolean;
+}> {
 	const { client, name: demoName } = params;
 
-	const demoMetadata = (await getDemoIndex())[client][demoName];
+	const demoMetadata = (await getDemoIndex())[client]?.[demoName];
+	if (!demoMetadata) {
+		throw error(404, `no demo named ${demoName} found in client ${client}`);
+	}
+
+	demoViewsTotal.inc({ client, name: demoName });
 
 	const files = await Promise.all(
 		demoMetadata.files.map(async (fileName) => {
@@ -26,5 +39,12 @@ export async function load({
 		})
 	);
 
-	return { links: demoMetadata.links, files, demoName };
+	return {
+		links: demoMetadata.links,
+		files,
+		demoName,
+		displayName: demoMetadata.displayName,
+		description: demoMetadata.description,
+		agentEnabled: env.AGENT_ENABLED === 'true'
+	};
 }

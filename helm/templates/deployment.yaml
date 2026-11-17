@@ -1,0 +1,106 @@
+{{- $releaseName := .Release.Name -}}
+{{- $chartName := include "developer-portal.name" . -}}
+{{- $cloudProviderFlavor := include "developer-portal.cloudProviderFlavor" . -}}
+{{- $cloudProviderDockerRegistryUrl := include "developer-portal.cloudProviderDockerRegistryUrl" . -}}
+{{- $cloudProviderImagePullSecretName := include "developer-portal.cloudProviderImagePullSecretName" . -}}
+{{- $imageTag := include "developer-portal.tag" . -}}
+{{- if .Values.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $releaseName }}-{{ $chartName }}
+  labels:
+    app: {{ $chartName }}
+    component: {{ $chartName }}
+    environment: {{ include "developer-portal.environment" . }}
+    release: {{ $releaseName }}
+    {{- include "developer-portal.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ $chartName }}
+      release: {{ $releaseName }}
+      run: {{ $releaseName }}-{{ $chartName }}
+      {{- include "developer-portal.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ $chartName }}
+        release: {{ $releaseName }}
+        run: {{ $releaseName }}-{{ $chartName }}
+        {{- include "developer-portal.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- if .Values.resetOnConfigChange }}
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if not .Values.s3.existingSecret }}
+        checksum/s3-secret: {{ include (print $.Template.BasePath "/s3-secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if and .Values.agent.enabled (not .Values.agent.litellm.existingSecret) }}
+        checksum/agent-secret: {{ include (print $.Template.BasePath "/agent-secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- end }}
+        {{- include "mclabels.annotations" . | trim | nindent 8 }}
+    spec:
+    {{- if $cloudProviderImagePullSecretName }}
+      imagePullSecrets:
+        - name: {{ $cloudProviderImagePullSecretName | quote }}
+    {{- end }}
+      containers:
+        - name: {{ $releaseName }}-{{ $chartName }}-deployment
+          {{- with .Values.image }}
+          image: {{ .repository }}:{{ $imageTag }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+          env:
+            - name: NODE_OPTIONS
+              value: 'no-network-family-autoselection'
+            {{- if .Values.global.ca.secretName }}
+            - name: NODE_EXTRA_CA_CERTS
+              value: '/usr/local/share/ca-certificates/ca.crt'
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ $releaseName }}-{{ $chartName }}-configmap
+            - secretRef:
+                name: {{ include "developer-portal.s3SecretName" . }}
+            {{- if .Values.agent.enabled }}
+            - secretRef:
+                name: {{ include "developer-portal.agentSecretName" . }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          startupProbe:
+            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            httpGet:
+              path: /
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          {{- if .Values.resources.enabled }}
+          resources:
+            {{- toYaml .Values.resources.value | nindent 12 }}
+          {{- end }}
+          {{- if .Values.global.ca.secretName }}
+          volumeMounts:
+            - name: root-ca
+              mountPath: '/usr/local/share/ca-certificates/ca.crt'
+              subPath: 'ca.crt'
+          {{- end }}
+      {{- if .Values.global.ca.secretName }}
+      volumes:
+        - name: root-ca
+          secret:
+            secretName: {{ .Values.global.ca.secretName }}
+      {{- end }}
+{{- end -}}

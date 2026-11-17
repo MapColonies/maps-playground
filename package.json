@@ -1,6 +1,6 @@
 {
 	"name": "maps-playground",
-	"version": "0.0.1",
+	"version": "1.6.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -9,13 +9,19 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write ."
+		"format": "prettier --plugin-search-dir . --write .",
+		"upload-examples": "zx scripts/upload-examples.mjs",
+		"upload-all": "zx scripts/upload-examples.mjs --assets",
+		"test": "vitest run",
+		"test:watch": "vitest"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/adapter-node": "^1.2.4",
 		"@sveltejs/adapter-static": "^2.0.3",
 		"@sveltejs/kit": "^1.5.0",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/svelte": "^4.2.3",
 		"@types/node": "^20.2.1",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
@@ -27,6 +33,7 @@
 		"fast-equals": "^5.0.1",
 		"flowbite": "^1.6.5",
 		"flowbite-svelte": "^0.35.4",
+		"jsdom": "^24.1.3",
 		"micro-memoize": "^4.1.2",
 		"postcss": "^8.4.23",
 		"postcss-load-config": "^4.0.1",
@@ -37,9 +44,11 @@
 		"svelte-preprocess": "^5.0.3",
 		"tailwindcss": "^3.3.1",
 		"tslib": "^2.4.1",
-		"typescript": "^5.0.0",
+		"typescript": "~5.4.0",
 		"vite": "^4.3.0",
-		"vite-plugin-static-copy": "^0.15.0"
+		"vite-plugin-static-copy": "^0.15.0",
+		"vitest": "^1.6.1",
+		"zx": "^8.8.5"
 	},
 	"type": "module",
 	"dependencies": {
@@ -47,6 +56,10 @@
 		"@popperjs/core": "^2.11.7",
 		"ajv": "^8.12.0",
 		"async-cache-dedupe": "^1.12.0",
-		"classnames": "^2.3.2"
+		"classnames": "^2.3.2",
+		"dompurify": "^3.4.12",
+		"highlight.js": "^11.11.1",
+		"marked": "^12.0.2",
+		"prom-client": "^15.1.3"
 	}
 }

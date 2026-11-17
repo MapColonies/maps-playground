@@ -11,6 +11,7 @@ export interface Link {
 
 export interface DemoMetadata {
 	displayName?: string;
+	description?: string;
 	image?: string;
 	files: string[];
 	links: Link[];
@@ -19,3 +20,8 @@ export interface DemoMetadata {
 export type ClientMetadata = Record<string, DemoMetadata>;
 
 export type DemoIndex = Record<string, ClientMetadata>;
+
+export interface ChatMessage {
+	role: 'user' | 'assistant';
+	content: string;
+}

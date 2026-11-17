@@ -1,0 +1,107 @@
+global:
+  cloudProvider: {}
+  environment: {}
+  # Pre-existing Secret (ca.crt key) trusted for outbound TLS; '' disables.
+  ca:
+    secretName: 'root-ca'
+enabled: true
+environment: development
+replicaCount: 1
+initialDelaySeconds: 60
+nodePort: 30030
+resetOnConfigChange: true
+cloudProvider:
+  imagePullSecretName: mapcolonies-pull-secret
+  flavor: openshift
+
+image:
+  repository: localhost/mapcolonies/common/maps-playground
+  imagePullPolicy: IfNotPresent
+
+mclabels:
+  environment: production
+  owner: common
+  partOf: maps-playground
+  component: frontend
+  criticality: internal
+  prometheus:
+    enabled: true
+    port: 8080
+    path: /metrics
+  logScraping: false
+
+metrics:
+  grafanaDashboard:
+    enabled: true
+    label: grafana_dashboard
+    value: "1"
+
+s3:
+  url: 'http://localhost:9000'
+  bucket: 'temp'
+  region: 'us-east-1'
+  # Existing Secret with AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY; '' creates one below.
+  existingSecret: ''
+  accessKeyId: 'user'
+  secretAccessKey: 'password'
+
+items:
+  indexKey: 'index.json'
+  timeout: 600
+  stale: 600
+
+links:
+  catalogHref: 'http://catalog'
+  devPortalHref: 'http://developer-portal'
+  puzzleHref: ''
+
+cache:
+  debounceMs: 500
+
+# Agent chat panel; dark unless enabled.
+agent:
+  enabled: false
+  model: inclusionai/ling-3.0-flash:free
+  developerPortalUrl: 'http://developer-portal'
+  # Override expected browser Origin for /api/agent behind a proxy; '' = app origin.
+  allowedOrigin: ''
+  litellm:
+    baseUrl: 'http://litellm:4000'
+    # Existing Secret with LITELLM_API_KEY; '' creates one from apiKey below.
+    existingSecret: ''
+    apiKey: ''
+
+resources:
+  enabled: true
+  value:
+    limits:
+      cpu: 200m
+      memory: 150Mi
+    requests:
+      cpu: 50m
+      memory: 150Mi
+
+route:
+  enabled: true
+  https: true
+  path: /
+  host: playground
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    certificate: ''
+    key: ''
+    caCertificate: ''
+    insecureEdgeTerminationPolicy: Redirect # <- important
+  timeout:
+    enabled: false
+    duration: 60s
+
+ingress:
+  enabled: false
+  path: /
+  host: localhost
+  cors:
+    enabled: true
+    origin: '*'

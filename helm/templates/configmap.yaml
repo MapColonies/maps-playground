@@ -1,0 +1,26 @@
+{{- $chartName := include "developer-portal.name" . -}}
+{{- if .Values.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-{{ $chartName }}-configmap
+data:
+  AWS_ENDPOINT_URL: {{ .Values.s3.url | quote }}
+  AWS_BUCKET: {{ .Values.s3.bucket | quote }}
+  AWS_REGION: {{ .Values.s3.region | quote }}
+  INDEX_KEY: {{ .Values.items.indexKey | quote }}
+  ITEMS_TIMEOUT: {{ .Values.items.timeout | quote }}
+  ITEMS_STALE: {{ .Values.items.stale | quote }}
+  PUBLIC_CATALOG_HREF: {{ .Values.links.catalogHref | quote }}
+  PUBLIC_DEVPORTAL_HREF: {{ .Values.links.devPortalHref | quote }}
+  PUBLIC_PUZZLE_HREF: {{ .Values.links.puzzleHref | quote }}
+  PUBLIC_CACHE_DEBOUNCE_MS: {{ .Values.cache.debounceMs | quote }}
+  AGENT_ENABLED: {{ .Values.agent.enabled | quote }}
+  LITELLM_BASE_URL: {{ .Values.agent.litellm.baseUrl | quote }}
+  AGENT_MODEL: {{ .Values.agent.model | quote }}
+  DEVELOPER_PORTAL_URL: {{ .Values.agent.developerPortalUrl | quote }}
+  {{- with .Values.agent.allowedOrigin }}
+  AGENT_ALLOWED_ORIGIN: {{ . | quote }}
+  {{- end }}
+  npm_config_cache: /tmp/
+{{- end }}

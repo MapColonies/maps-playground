@@ -1,4 +1,5 @@
 # MapColonies Playground
+
 Code playground for mapping clients.
 The code examples are saved in S3 bucket and fetched and cached by the server.
 
@@ -20,63 +21,70 @@ The code examples are saved in S3 bucket and fetched and cached by the server.
 
 The codes examples shown are defined by a json index file with all the data needed. All the files listed in the index are loaded from the same bucket as the index itself.
 
+### Example config values
+
+`examples/config/*.js` holds the values the examples connect with: service URLs, the token, product IDs, layer names, extents and levels. Each environment uploads its own copy of these files to its bucket, so the repo commits only placeholders. A placeholder is an upper-case token, usually the value's own name, for example `export var PRODUCT_ID = 'PRODUCT_ID';`. Never commit a real environment value.
+
+Names ending in `_SCHEME`, `_TYPE` or `_FORMAT` are protocol or catalog constants, the same in every environment, and keep their real values. `npm test` fails when any other value in these files isn't a placeholder (`src/test/configPlaceholders.test.ts`).
+
 ### example index
+
 ```json
 {
-  "ol": {
-    "basic-ol": {
-      "displayName": "basic openlayers",
-      "files": ["openlayers_basic.js", "openlayers.css", "openlayers.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-      ]
-    },
-    "geojson-style-ol": {
-      "displayName": "geojson openlayers",
-      "files": ["openlayers_geojson.js", "openlayers.css", "openlayers.html"],
-      "links": [
-        { "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
-        { "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
-      ]
-    }
-  },
-  "cesium": {
-    "basic-cesium": {
-      "displayName": "basic cesium",
-      "files": ["cesium_basic.js", "cesium.html"],
-      "links": [
-        {
-          "name": "cesium.js",
-          "url": "/libs/Cesium/Cesium.js",
-          "type": "js"
-        },
-        {
-          "name": "widgets.css",
-          "url": "/libs/Cesium/Widgets/widgets.css",
-          "type": "css"
-        }
-      ]
-    }
-  },
-  "leaflet": {
-    "basic-leaflet": {
-      "displayName": "basic leaflet",
-      "files": ["leaflet_basic.js", "leaflet.css", "leaflet.html"],
-      "links": [
-        {
-          "name": "leaflet.js",
-          "url": "/libs/leaflet/1.9.4/leaflet.js",
-          "type": "js"
-        },
-        {
-          "name": "leaflet.css",
-          "url": "/libs/leaflet/1.9.4/leaflet.css",
-          "type": "css"
-        }
-      ]
-    }
-  }
+	"ol": {
+		"basic-ol": {
+			"displayName": "basic openlayers",
+			"files": ["openlayers_basic.js", "openlayers.css", "openlayers.html"],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
+		},
+		"geojson-style-ol": {
+			"displayName": "geojson openlayers",
+			"files": ["openlayers_geojson.js", "openlayers.css", "openlayers.html"],
+			"links": [
+				{ "name": "ol.css", "url": "/libs/ol/v7.3.0/ol.css", "type": "css" },
+				{ "name": "ol.js", "url": "/libs/ol/v7.3.0/ol.js", "type": "js" }
+			]
+		}
+	},
+	"cesium": {
+		"basic-cesium": {
+			"displayName": "basic cesium",
+			"files": ["cesium_basic.js", "cesium.html"],
+			"links": [
+				{
+					"name": "cesium.js",
+					"url": "/libs/Cesium/Cesium.js",
+					"type": "js"
+				},
+				{
+					"name": "widgets.css",
+					"url": "/libs/Cesium/Widgets/widgets.css",
+					"type": "css"
+				}
+			]
+		}
+	},
+	"leaflet": {
+		"basic-leaflet": {
+			"displayName": "basic leaflet",
+			"files": ["leaflet_basic.js", "leaflet.css", "leaflet.html"],
+			"links": [
+				{
+					"name": "leaflet.js",
+					"url": "/libs/leaflet/1.9.4/leaflet.js",
+					"type": "js"
+				},
+				{
+					"name": "leaflet.css",
+					"url": "/libs/leaflet/1.9.4/leaflet.css",
+					"type": "css"
+				}
+			]
+		}
+	}
 }
 ```
 
