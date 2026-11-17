@@ -21,6 +21,12 @@ The code examples are saved in S3 bucket and fetched and cached by the server.
 
 The codes examples shown are defined by a json index file with all the data needed. All the files listed in the index are loaded from the same bucket as the index itself.
 
+### Example config values
+
+`examples/config/*.js` holds the values the examples connect with: service URLs, the token, product IDs, layer names, extents and levels. Each environment uploads its own copy of these files to its bucket, so the repo commits only placeholders. A placeholder is an upper-case token, usually the value's own name, for example `export var PRODUCT_ID = 'PRODUCT_ID';`. Never commit a real environment value.
+
+Names ending in `_SCHEME`, `_TYPE` or `_FORMAT` are protocol or catalog constants, the same in every environment, and keep their real values. `npm test` fails when any other value in these files isn't a placeholder (`src/test/configPlaceholders.test.ts`).
+
 ### example index
 
 ```json

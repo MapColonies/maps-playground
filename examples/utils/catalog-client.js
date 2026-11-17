@@ -14,7 +14,7 @@ const namespaceFor = (catalogKey) => `http://schema.mapcolonies.com/${catalogKey
  *
  * @param {string} typename - CSW typeName for the catalog (e.g. 'mc:MCRasterRecord').
  * @param {string} namespace - XML namespace URI for the catalog schema.
- * @param {string} productId - Product identifier to match (e.g. 'blueMarble').
+ * @param {string} productId - Product identifier to match (PRODUCT_ID in the config files).
  * @param {string} productType - Product type to match (e.g. 'Orthophoto').
  * @returns {string} CSW GetRecords request XML.
  */
