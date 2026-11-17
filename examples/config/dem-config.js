@@ -7,8 +7,8 @@ export var DEM_TERRAIN_SCHEME = 'TERRAIN_QMESH';
 export var TERRAIN_PRODUCT_ID = '33333333-3333-3333-3333-333333333333';
 export var TERRAIN_PRODUCT_TYPE = 'QuantizedMeshDTMBest';
 export var DEM_URL = `${MAPCOLONIES_TILES_URL}/api/dem/v1/terrains/${PRODUCT_ID}`;
-export var TERRAINRGB_LAYER = 'a3-05m';
+export var TERRAINRGB_LAYER = 'TERRAINRGB_LAYER';
 // Tile rows count from the top (WorldCRS84); tiles outside the data answer 404.
 export var TERRAINRGB_URL = `${MAPCOLONIES_TILES_URL}/api/dem/v1/terrains/${TERRAINRGB_LAYER}/{z}/{x}/{y}.webp`;
-export var TERRAINRGB_MAX_LEVEL = 15;
-export var TERRAINRGB_EXTENT = [34.9, 32.36, 35.36, 32.75];
+export var TERRAINRGB_MAX_LEVEL = 'TERRAINRGB_MAX_LEVEL';
+export var TERRAINRGB_EXTENT = 'TERRAINRGB_EXTENT';
