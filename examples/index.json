@@ -380,5 +380,28 @@
 				}
 			]
 		}
+	},
+	"MapLibre": {
+		"WMTS": {
+			"displayName": "Basic WMTS Example",
+			"description": "MapLibre GL map consuming the MapColonies WMTS service in its native WorldCRS84 tiling, with no reprojection to Web Mercator.\n\nUses a MapLibre GL JS fork that adds the WorldCRS84Quad tile matrix set (setWorldCRS). It is a pre-release build, so expect API changes.",
+			"files": [
+				"maplibre-wmts/wmts.js",
+				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/wmts-utils.js",
+				"utils/xml-utils.js",
+				"maplibre-wmts/maplibre.css",
+				"maplibre-wmts/maplibre.html"
+			],
+			"links": [
+				{
+					"name": "maplibre-gl.css",
+					"url": "/libs/maplibre-gl-crs84/6.7.0-rc.1/maplibre-gl.css",
+					"type": "css"
+				}
+			]
+		}
 	}
 }
