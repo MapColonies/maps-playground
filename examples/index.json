@@ -477,6 +477,24 @@
 					"type": "css"
 				}
 			]
+		},
+		"TerrainRGB": {
+			"displayName": "TerrainRGB Terrain",
+			"description": "Drapes a MapColonies TerrainRGB layer as 3D terrain in MapLibre, coloured by elevation with hillshade, and shows the height under the mouse. MapLibre decodes the tiles itself, in their native WorldCRS84 tiling.\n\nThe shortest path to tilted 3D elevation in a 2D web map.",
+			"files": [
+				"maplibre-terrainrgb/terrainrgb.js",
+				"config/common-config.js",
+				"config/dem-config.js",
+				"maplibre-terrainrgb/terrainrgb.css",
+				"maplibre-terrainrgb/terrainrgb.html"
+			],
+			"links": [
+				{
+					"name": "maplibre-gl.css",
+					"url": "/libs/maplibre-gl-crs84/6.7.0-rc.1/maplibre-gl.css",
+					"type": "css"
+				}
+			]
 		}
 	}
 }
