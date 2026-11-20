@@ -11,6 +11,7 @@ export default defineConfig({
 			$lib: path.resolve('./src/lib'),
 			'$app/stores': path.resolve('./src/test/virtual/app-stores.ts'),
 			'$app/navigation': path.resolve('./src/test/virtual/app-navigation.ts'),
+			'$app/paths': path.resolve('./src/test/virtual/app-paths.ts'),
 			'$env/dynamic/public': path.resolve('./src/test/virtual/env-dynamic-public.ts'),
 			'$env/dynamic/private': path.resolve('./src/test/virtual/env-dynamic-private.ts')
 		},
