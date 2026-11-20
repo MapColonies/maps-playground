@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-node@v4
         if: github.event.action != 'closed'
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -35,6 +35,8 @@ jobs:
         env:
           BUILD_TARGET: gh-pages
           BASE_PATH: /${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.number }}
+          # GitHub Pages serves no API routes, so the agent chat has no backend there.
+          AGENT_ENABLED: 'false'
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
