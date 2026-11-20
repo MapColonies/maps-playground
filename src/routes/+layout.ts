@@ -1,1 +1,3 @@
-export const prerender = true;
+import { isGhPagesBuild } from '$lib/buildTarget';
+
+export const prerender = isGhPagesBuild;
