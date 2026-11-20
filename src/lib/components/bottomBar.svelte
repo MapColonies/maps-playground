@@ -1,10 +1,5 @@
 <script lang="ts">
-	import {
-		BottomNav,
-		BottomNavItem,
-		Tooltip,
-		BottomNavHeader
-	} from 'flowbite-svelte';
+	import { BottomNav, BottomNavItem, Tooltip, BottomNavHeader } from 'flowbite-svelte';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { page } from '$app/stores';
@@ -46,7 +41,8 @@
 			<BottomHeaderItem
 				itemName={client.name}
 				on:click={() =>
-					client.name === activeClient || goto(base + '/demo/' + client.name + '/' + client.defaultItem)}
+					client.name === activeClient ||
+					goto(base + '/demo/' + client.name + '/' + client.defaultItem)}
 				active={client.name === activeClient}
 				unread={client.name !== activeClient && isClientUnread(client.name)}
 				innerClass="grid max-w-fit grid-cols-{clients.length > 12
