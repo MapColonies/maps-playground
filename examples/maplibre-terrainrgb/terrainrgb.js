@@ -1,5 +1,7 @@
 import { TOKEN } from './config/common-config.js';
+import { PRODUCT_ID, PRODUCT_TYPE } from './config/raster-config.js';
 import { TERRAINRGB_URL, TERRAINRGB_MAX_LEVEL, TERRAINRGB_EXTENT } from './config/dem-config.js';
+import { fetchWmtsTileTemplate } from './utils/wmts-utils.js';
 
 const maplibregl = await import(
 	`${location.origin}/libs/maplibre-gl-crs84/6.7.0-rc.1/maplibre-gl.mjs`
@@ -32,6 +34,7 @@ const map = new maplibregl.Map({
 				type: 'color-relief',
 				source: 'dem',
 				paint: {
+					'color-relief-opacity': 0.4,
 					'color-relief-color': [
 						'interpolate',
 						['linear'],
@@ -57,6 +60,18 @@ const map = new maplibregl.Map({
 });
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }));
 map.addControl(new maplibregl.TerrainControl({ source: 'terrain', exaggeration: EXAGGERATION }));
+
+Promise.all([fetchWmtsTileTemplate(PRODUCT_ID, PRODUCT_TYPE), map.once('load')]).then(
+	([{ template }]) => {
+		const url = template
+			.replace('{TileMatrixSet}', 'WorldCRS84')
+			.replace('{TileMatrix}', '{z}')
+			.replace('{TileRow}', '{y}')
+			.replace('{TileCol}', '{x}');
+		map.addSource('base', { type: 'raster', tiles: [`${url}?token=${TOKEN}`], tileSize: 256 });
+		map.addLayer({ id: 'base', type: 'raster', source: 'base' }, 'relief');
+	}
+);
 
 const label = document.getElementById('info');
 map.on('mousemove', (e) => {

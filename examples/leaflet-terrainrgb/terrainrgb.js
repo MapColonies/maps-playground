@@ -1,4 +1,7 @@
+import { TOKEN } from './config/common-config.js';
+import { PRODUCT_ID, PRODUCT_TYPE } from './config/raster-config.js';
 import { TERRAINRGB_MAX_LEVEL, TERRAINRGB_EXTENT } from './config/dem-config.js';
+import { fetchWmtsTileTemplate } from './utils/wmts-utils.js';
 import { TILE_SIZE, fetchHeights, rampColour } from './utils/terrainrgb-utils.js';
 
 // An empty extent ('', [] or null) means the whole world.
@@ -35,7 +38,17 @@ const TerrainRgbLayer = L.GridLayer.extend({
 const map = L.map('map', { crs: L.CRS.EPSG4326, maxZoom: TERRAINRGB_MAX_LEVEL + 3 });
 if (bounds) map.fitBounds(bounds);
 else map.setView([0, 0], 0);
-new TerrainRgbLayer({ maxNativeZoom: TERRAINRGB_MAX_LEVEL, bounds }).addTo(map);
+new TerrainRgbLayer({ maxNativeZoom: TERRAINRGB_MAX_LEVEL, bounds, opacity: 0.4 }).addTo(map);
+
+fetchWmtsTileTemplate(PRODUCT_ID, PRODUCT_TYPE).then(({ template }) => {
+	const url = template
+		.replace('{TileMatrixSet}', 'WorldCRS84')
+		.replace('{TileMatrix}', '{z}')
+		.replace('{TileRow}', '{y}')
+		.replace('{TileCol}', '{x}');
+	// The base layer loads last, so a lower zIndex keeps it under the heights.
+	L.tileLayer(`${url}?token=${TOKEN}`, { zIndex: 0 }).addTo(map);
+});
 
 const info = document.getElementById('info');
 map.on('mousemove', (event) => {
