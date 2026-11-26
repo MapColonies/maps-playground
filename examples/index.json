@@ -198,6 +198,10 @@
 			"files": [
 				"openlayers-terrainrgb/terrainrgb.js",
 				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/wmts-utils.js",
+				"utils/xml-utils.js",
 				"config/dem-config.js",
 				"utils/terrainrgb-utils.js",
 				"openlayers-terrainrgb/terrainrgb.css",
@@ -437,6 +441,10 @@
 			"files": [
 				"leaflet-terrainrgb/terrainrgb.js",
 				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/wmts-utils.js",
+				"utils/xml-utils.js",
 				"config/dem-config.js",
 				"utils/terrainrgb-utils.js",
 				"leaflet-terrainrgb/terrainrgb.css",
@@ -484,6 +492,10 @@
 			"files": [
 				"maplibre-terrainrgb/terrainrgb.js",
 				"config/common-config.js",
+				"config/raster-config.js",
+				"utils/catalog-client.js",
+				"utils/wmts-utils.js",
+				"utils/xml-utils.js",
 				"config/dem-config.js",
 				"maplibre-terrainrgb/terrainrgb.css",
 				"maplibre-terrainrgb/terrainrgb.html"
