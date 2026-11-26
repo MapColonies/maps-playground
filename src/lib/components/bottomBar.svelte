@@ -1,12 +1,7 @@
 <script lang="ts">
-	import {
-		BottomNav,
-		BottomNavItem,
-		Tooltip,
-		BottomNavHeader,
-		BottomNavHeaderItem
-	} from 'flowbite-svelte';
+	import { BottomNav, BottomNavItem, Tooltip, BottomNavHeader } from 'flowbite-svelte';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { page } from '$app/stores';
 	import BottomHeaderItem from './bottomHeaderItem.svelte';
 	import { unreadChats } from '$lib/stores/unreadChats';
@@ -46,7 +41,8 @@
 			<BottomHeaderItem
 				itemName={client.name}
 				on:click={() =>
-					client.name === activeClient || goto('/demo/' + client.name + '/' + client.defaultItem)}
+					client.name === activeClient ||
+					goto(base + '/demo/' + client.name + '/' + client.defaultItem)}
 				active={client.name === activeClient}
 				unread={client.name !== activeClient && isClientUnread(client.name)}
 				innerClass="grid max-w-fit grid-cols-{clients.length > 12
@@ -57,7 +53,7 @@
 	</BottomNavHeader>
 	{#each items as item}
 		<BottomNavItem
-			on:click={() => goto('/demo/' + activeClient + '/' + item.name)}
+			on:click={() => goto(base + '/demo/' + activeClient + '/' + item.name)}
 			id="group-{item.name}"
 			btnDefault={classNames(
 				'relative basis-0 items-center justify-center ml-[4px] mb-1 rounded-lg p-4 group',

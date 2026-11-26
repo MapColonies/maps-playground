@@ -1,4 +1,4 @@
-FROM node:20 as build
+FROM node:24 as build
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:24-alpine
 ENV PORT 8080
 WORKDIR /app
 

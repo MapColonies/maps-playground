@@ -2,7 +2,21 @@ import { error } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import { getDemoIndex, getFile } from '$lib/server/demoManager.js';
 import { demoViewsTotal } from '$lib/server/metrics';
+import { isGhPagesBuild } from '$lib/buildTarget';
 import type { Link, File } from '$lib/types';
+
+// SvelteKit calls entries() on every build, prerendered or not.
+export async function entries(): Promise<Array<{ client: string; name: string }>> {
+	if (!isGhPagesBuild) return [];
+	const index = await getDemoIndex();
+	const out: Array<{ client: string; name: string }> = [];
+	for (const [client, demos] of Object.entries(index)) {
+		for (const name of Object.keys(demos)) {
+			out.push({ client, name });
+		}
+	}
+	return out;
+}
 
 export async function load({ params }): Promise<{
 	links: Link[];
