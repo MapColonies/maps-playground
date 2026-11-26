@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.7.0](https://github.com/MapColonies/maps-playground/compare/v1.6.0...v1.7.0) (2026-11-26)
+
+
+### Features
+
+* **examples:** allow empty TerrainRGB extent ([#46](https://github.com/MapColonies/maps-playground/issues/46)) ([8b3da75](https://github.com/MapColonies/maps-playground/commit/8b3da75ae605040b7a513880cedba722f9fb4e25))
+* **examples:** show a raster base layer under the TerrainRGB heights ([#47](https://github.com/MapColonies/maps-playground/issues/47)) ([5f7af25](https://github.com/MapColonies/maps-playground/commit/5f7af255de026215eefaaab5dade4f6a830efdac))
+
 ## [1.6.0](https://github.com/MapColonies/maps-playground/compare/v1.5.0...v1.6.0) (2026-11-17)
 
 
