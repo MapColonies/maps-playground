@@ -1,6 +1,9 @@
 import { TERRAINRGB_MAX_LEVEL, TERRAINRGB_EXTENT } from './config/dem-config.js';
 import { TILE_SIZE, tileUrl, decodeHeight, RAMP_STOPS } from './utils/terrainrgb-utils.js';
 
+// An empty extent ('', [] or null) means the whole world.
+const extent = TERRAINRGB_EXTENT?.length ? TERRAINRGB_EXTENT : undefined;
+
 // Bands arrive scaled to 0..1, so each is multiplied back by 255 before decoding.
 const height = [
 	'+',
@@ -26,7 +29,7 @@ const layer = new ol.layer.WebGLTile({
 		// Blending neighbouring pixels would mix their encoded bytes into wrong heights.
 		interpolate: false
 	}),
-	extent: TERRAINRGB_EXTENT,
+	extent,
 	style: {
 		// Transparent pixels are no data.
 		color: [
@@ -43,7 +46,7 @@ const map = new ol.Map({
 	layers: [layer],
 	view: new ol.View({ projection: 'EPSG:4326', center: [0, 0], zoom: 2 })
 });
-map.getView().fit(TERRAINRGB_EXTENT);
+if (extent) map.getView().fit(extent);
 
 const info = document.getElementById('info');
 map.on('pointermove', (event) => {

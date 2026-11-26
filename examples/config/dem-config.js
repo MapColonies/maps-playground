@@ -11,4 +11,5 @@ export var TERRAINRGB_LAYER = 'TERRAINRGB_LAYER';
 // Tile rows count from the top (WorldCRS84); tiles outside the data answer 404.
 export var TERRAINRGB_URL = `${MAPCOLONIES_TILES_URL}/api/dem/v1/terrains/${TERRAINRGB_LAYER}/{z}/{x}/{y}.webp`;
 export var TERRAINRGB_MAX_LEVEL = 'TERRAINRGB_MAX_LEVEL';
+// [minX, minY, maxX, maxY] in degrees, e.g. [34, 29, 36, 34]; '' or [] skips it.
 export var TERRAINRGB_EXTENT = 'TERRAINRGB_EXTENT';

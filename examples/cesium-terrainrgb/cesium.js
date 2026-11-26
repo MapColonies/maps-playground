@@ -4,13 +4,17 @@ import { TERRAINRGB_MAX_LEVEL, TERRAINRGB_EXTENT } from './config/dem-config.js'
 import { fetchWmtsTileTemplate } from './utils/wmts-utils.js';
 import { TILE_SIZE, fetchHeights } from './utils/terrainrgb-utils.js';
 
+// An empty extent ('', [] or null) means the whole world.
+const extent = TERRAINRGB_EXTENT?.length ? TERRAINRGB_EXTENT : undefined;
+
 const flat = () => new Float32Array(TILE_SIZE * TILE_SIZE);
 
 function intersectsData(level, x, y) {
+	if (!extent) return true;
 	const size = 180 / 2 ** level;
 	const west = -180 + x * size;
 	const north = 90 - y * size;
-	const [minX, minY, maxX, maxY] = TERRAINRGB_EXTENT;
+	const [minX, minY, maxX, maxY] = extent;
 	return west < maxX && west + size > minX && north > minY && north - size < maxY;
 }
 
@@ -67,15 +71,17 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
 });
 viewer.scene.verticalExaggeration = 3;
 
-const [minX, minY, maxX] = TERRAINRGB_EXTENT;
-viewer.camera.flyTo({
-	destination: Cesium.Cartesian3.fromDegrees((minX + maxX) / 2, minY - 0.15, 25000),
-	orientation: {
-		heading: Cesium.Math.toRadians(0),
-		pitch: Cesium.Math.toRadians(-30),
-		roll: 0
-	}
-});
+if (extent) {
+	const [minX, minY, maxX] = extent;
+	viewer.camera.flyTo({
+		destination: Cesium.Cartesian3.fromDegrees((minX + maxX) / 2, minY - 0.15, 25000),
+		orientation: {
+			heading: Cesium.Math.toRadians(0),
+			pitch: Cesium.Math.toRadians(-30),
+			roll: 0
+		}
+	});
+}
 
 fetchWmtsTileTemplate(PRODUCT_ID, PRODUCT_TYPE, LAYER_IMAGE_FORMAT).then((raster) => {
 	viewer.imageryLayers.addImageryProvider(

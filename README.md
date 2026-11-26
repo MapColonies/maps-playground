@@ -25,6 +25,8 @@ The codes examples shown are defined by a json index file with all the data need
 
 `examples/config/*.js` holds the values the examples connect with: service URLs, the token, product IDs, layer names, extents and levels. Each environment uploads its own copy of these files to its bucket, so the repo commits only placeholders. A placeholder is an upper-case token, usually the value's own name, for example `export var PRODUCT_ID = 'PRODUCT_ID';`. Never commit a real environment value.
 
+`TERRAINRGB_EXTENT` is `[minX, minY, maxX, maxY]` in degrees. Set it to `''` or `[]` to skip it: the TerrainRGB examples then request tiles everywhere and open on the whole world.
+
 Names ending in `_SCHEME`, `_TYPE` or `_FORMAT` are protocol or catalog constants, the same in every environment, and keep their real values. `npm test` fails when any other value in these files isn't a placeholder (`src/test/configPlaceholders.test.ts`).
 
 ### example index

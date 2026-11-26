@@ -1,10 +1,11 @@
 import { TERRAINRGB_MAX_LEVEL, TERRAINRGB_EXTENT } from './config/dem-config.js';
 import { TILE_SIZE, fetchHeights, rampColour } from './utils/terrainrgb-utils.js';
 
-const [minX, minY, maxX, maxY] = TERRAINRGB_EXTENT;
-const bounds = [
-	[minY, minX],
-	[maxY, maxX]
+// An empty extent ('', [] or null) means the whole world.
+const extent = TERRAINRGB_EXTENT?.length ? TERRAINRGB_EXTENT : undefined;
+const bounds = extent && [
+	[extent[1], extent[0]],
+	[extent[3], extent[2]]
 ];
 const tiles = new Map();
 
@@ -31,9 +32,9 @@ const TerrainRgbLayer = L.GridLayer.extend({
 });
 
 // L.CRS.EPSG4326 zoom 0 is 2 x 1 tiles of 256 px, the same grid as WorldCRS84.
-const map = L.map('map', { crs: L.CRS.EPSG4326, maxZoom: TERRAINRGB_MAX_LEVEL + 3 }).fitBounds(
-	bounds
-);
+const map = L.map('map', { crs: L.CRS.EPSG4326, maxZoom: TERRAINRGB_MAX_LEVEL + 3 });
+if (bounds) map.fitBounds(bounds);
+else map.setView([0, 0], 0);
 new TerrainRgbLayer({ maxNativeZoom: TERRAINRGB_MAX_LEVEL, bounds }).addTo(map);
 
 const info = document.getElementById('info');

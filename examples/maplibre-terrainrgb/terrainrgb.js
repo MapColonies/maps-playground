@@ -5,13 +5,16 @@ const maplibregl = await import(
 	`${location.origin}/libs/maplibre-gl-crs84/6.7.0-rc.1/maplibre-gl.mjs`
 );
 
+// An empty extent ('', [] or null) means the whole world.
+const extent = TERRAINRGB_EXTENT?.length ? TERRAINRGB_EXTENT : undefined;
+
 const EXAGGERATION = 2;
 const dem = {
 	type: 'raster-dem',
 	tiles: [`${TERRAINRGB_URL}?token=${TOKEN}`],
 	tileSize: 256,
 	encoding: 'mapbox',
-	bounds: TERRAINRGB_EXTENT,
+	...(extent && { bounds: extent }),
 	maxzoom: TERRAINRGB_MAX_LEVEL
 };
 
@@ -48,7 +51,7 @@ const map = new maplibregl.Map({
 		],
 		terrain: { source: 'terrain', exaggeration: EXAGGERATION }
 	},
-	bounds: TERRAINRGB_EXTENT,
+	bounds: extent,
 	pitch: 60,
 	maxPitch: 85
 });
